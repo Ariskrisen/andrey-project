@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Заголовок будет меняться, поэтому начальный не так важен -->
-    <title>Таймер Андрея</title> 
+    <title>Таймер Андрея</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Canvas для эффекта "Матрицы" -->
+    <canvas id="matrixCanvas"></canvas>
+
     <div class="container">
         <h1 id="counter">Андрей пришел вовремя: 0 раз</h1>
         <div id="timer-wrapper">
             <div id="timer">00:00:00:00</div>
             <div class="cursor">_</div>
         </div>
-        
-        <!-- НОВЫЙ ЭЛЕМЕНТ для сообщений -->
         <p id="statusMessage">Ожидаем прибытия...</p>
-
         <button id="resetButton">[ Андрей прибыл ]</button>
         <button id="fullResetButton">[ Форматировать систему ]</button>
     </div>
+
+    <!-- НОВЫЙ АУДИО ЭЛЕМЕНТ. Он будет невидимым. -->
+    <audio id="dramaticSound" src="https://www.myinstants.com/media/sounds/dramatic-sound.mp3" preload="auto"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
