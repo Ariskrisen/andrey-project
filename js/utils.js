@@ -29,3 +29,9 @@ export function hideElement(element, useClass = false) {
         else element.style.display = 'none';
     }
 }
+
+// ДОБАВЬТЕ ЭТОТ ФРАГМЕНТ В КОНЕЦ ФАЙЛА utils.js
+
+export function randomDelay(config) {
+    return Math.random() * (config.max - config.min) + config.min;
+}
