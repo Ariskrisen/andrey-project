@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Таймер Андрея</title>
-    <link rel="icon" type="image/png" href="favicon.png"> <!-- Не забудьте добавить иконку, если хотите -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Exo+2:wght@400;700&family=Comic+Sans+MS&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Comic+Sans+MS&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,7 +20,7 @@
             <div id="timer">00:00:00:00</div>
             <div class="cursor">_</div>
         </div>
-        <p id="statusMessage">Ожидаем прибытия...</p>
+        <p id="statusMessage"></p>
 
         <!-- Бесполезный переключатель -->
         <div class="switch-container">
@@ -57,12 +56,12 @@
     <div id="fakeError" class="fake-error">
         <div class="fake-error-titlebar">
             <span>Andrey.exe - Системная ошибка</span>
-            <button id="closeError">X</button>
+            <button class="close-btn">X</button>
         </div>
         <div class="fake-error-content">
             <img src="https://www.freeiconspng.com/uploads/error-icon-3.png" alt="Error Icon">
             <p>Произошел сбой в модуле Andrey.exe.<br><br>Причина: Андрей не найден в указанное время. Повторите попытку завтра. Или никогда.</p>
-            <button id="okError">OK</button>
+            <button class="ok-btn">OK</button>
         </div>
     </div>
 
@@ -80,7 +79,22 @@
         <div class="clippy-bubble">
             Похоже, вы ждете Андрея. Хотите совет? Терпение. Больше у меня ничего нет.
         </div>
-        <button id="closeClippy">X</button>
+        <button class="close-btn">X</button>
+    </div>
+
+    <!-- Фальшивый Paywall -->
+    <div id="paywall" class="paywall">
+        <h3>Требуется оплата</h3>
+        <p>Ваше бесплатное время ожидания истекло. Пожалуйста, внесите 25 копеек, чтобы продолжить.</p>
+        <button id="closePaywall">Нет, я не буду платить за это</button>
+    </div>
+
+    <!-- Фальшивый индикатор загрузки -->
+    <div id="fakeLoader" class="fake-loader">
+        <p>Загрузка терпения...</p>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
     </div>
 
     <!-- Аудио элемент для звука -->
