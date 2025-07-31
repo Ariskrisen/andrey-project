@@ -66,8 +66,24 @@ body.chaos img, body.chaos canvas { filter: invert(1); }
 .fake-error-content .ok-btn { position: absolute; bottom: 10px; right: 50%; transform: translateX(50%); padding: 5px 25px; border: 1px solid #999; background-color: #f0f0f0; }
 
 /* Уведомление об обновлении */
-.update-notification { position: fixed; bottom: 20px; right: -400px; width: 350px; background-color: #333; border: 1px solid #555; padding: 15px; box-shadow: 0 0 20px black; z-index: 1001; transition: right 0.7s ease-in-out; }
-.update-notification.show { right: 20px; }
+.update-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    background-color: #333;
+    border: 1px solid #555;
+    padding: 15px;
+    box-shadow: 0 0 20px black;
+    z-index: 1001;
+    /* ИСПРАВЛЕНО: Скрываем через transform, а не через right */
+    transform: translateX(150%);
+    transition: transform 0.7s ease-in-out;
+}
+.update-notification.show {
+    /* ИСПРАВЛЕНО: Возвращаем на место */
+    transform: translateX(0);
+}
 .update-notification button { font-size: 0.9em; padding: 5px 10px; }
 
 /* Бесполезный переключатель */
@@ -139,7 +155,14 @@ body.tilted { transition: transform 0.5s ease-in-out; transform: rotate(-2deg); 
     }
     .fake-error { top: 15%; } /* Двигаем повыше */
     .paywall { top: 30%; }
-    .update-notification { right: 5vw; bottom: 20px; left: auto; transform: none; width: 80vw;} /* Перемещаем в угол */
+    .update-notification {
+    width: 85vw; /* Занимает 85% ширины экрана */
+    right: 5vw;  /* Отступ 5% справа */
+    bottom: 20px;
+    left: auto;
+    /* Сбрасываем translateX, так как transform уже используется для скрытия/показа */
+    transform: translateX(150%); 
+}
     
     /* Уменьшаем и перемещаем Скрепыша, чтобы не мешал */
     .clippy {
