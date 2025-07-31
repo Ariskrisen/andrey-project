@@ -1,22 +1,10 @@
-/* --- ОСНОВНЫЕ СТИЛИ (Ретро-терминал) --- */
-body {
-    background-color: #000;
-    color: #00FF41;
-    font-family: 'VT323', monospace;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    text-align: center;
-    overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
-    overflow-y: auto;   /* Разрешаем вертикальный скролл, если понадобится */
-}
+/* --- ОСНОВНЫЕ СТИЛИ --- */
+body { background-color: #000; color: #00FF41; font-family: 'VT323', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; overflow-x: hidden; overflow-y: auto; }
 .container { padding: 20px; border: 2px solid #00FF41; box-shadow: 0 0 15px #00FF41; position: relative; }
 h1, #timer, button { text-shadow: 0 0 8px #00FF41; }
 h1 { font-size: 3em; }
 #timer-wrapper { display: flex; justify-content: center; align-items: center; }
-#timer { font-size: 5em; margin: 20px 0; letter-spacing: 4px; }
+#timer { font-size: 5em; margin: 20px 0; letter-spacing: 4px; cursor: pointer; }
 .cursor { font-size: 4em; animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { color: transparent; } }
 button { background: transparent; border: 1px solid #00FF41; color: #00FF41; padding: 15px 32px; font-size: 1.5em; font-family: 'VT323', monospace; cursor: pointer; transition: background-color 0.3s, color 0.3s; margin: 10px; }
@@ -25,68 +13,34 @@ button:hover { background-color: #00FF41; color: #000; }
 #fullResetButton:hover { background-color: #FF4136; color: #000; }
 
 /* --- СТИЛИ ДЛЯ ВСЕХ ПРИКОЛОВ --- */
-
-/* Общие стили */
 #statusMessage { margin-top: 15px; font-size: 1.2em; min-height: 20px; color: #FFC300; }
 #statusMessage::after { content: '_'; animation: blink 1s step-end infinite; }
 @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
-.shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+.shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; will-change: transform; }
 body { cursor: wait; }
-
-/* Матрица, Хаос, Глючный таймер */
 #matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; display: none; }
 body.chaos { filter: invert(1); background-color: #fff; }
-body.chaos img, body.chaos canvas { filter: invert(1); }
+body.chaos img, body.chaos canvas, body.chaos .particle { filter: invert(1); }
 @keyframes glitch { 2%,64% { transform: translate(2px,0) skew(0deg); } 4%,60% { transform: translate(-2px,0) skew(0deg); } 62% { transform: translate(0,0) skew(5deg); } }
-#timer.glitch { animation: glitch 1s linear infinite; }
-
-/* Кнопка-беглец */
-#resetButton.runaway { position: absolute; transition: top 0.2s ease, left 0.2s ease; }
-
-/* Сломанный счетчик */
-#counter.over9000 { color: #FF00FF; animation: pulse 1s infinite; }
+#timer.glitch { animation: glitch 1s linear infinite; will-change: transform; }
+#resetButton.runaway { position: absolute; transition: top 0.2s ease, left 0.2s ease; will-change: top, left; }
+#counter.over9000 { color: #FF00FF; animation: pulse 1s infinite; will-change: transform, text-shadow; }
 @keyframes pulse { 0% { transform: scale(1); text-shadow: 0 0 10px #FF00FF; } 50% { transform: scale(1.1); text-shadow: 0 0 25px #FF00FF; } 100% { transform: scale(1); text-shadow: 0 0 10px #FF00FF; } }
-
-/* Баннер Cookie */
-.cookie-banner { position: fixed; bottom: -120px; left: 0; width: 100%; background-color: #1a1a1a; border-top: 2px solid #333; padding: 15px; text-align: center; z-index: 1000; transition: bottom 0.5s ease-in-out; }
+.cookie-banner { position: fixed; bottom: -120px; left: 0; width: 100%; background-color: #1a1a1a; border-top: 2px solid #333; padding: 15px; text-align: center; z-index: 1000; transition: bottom 0.5s ease-in-out; will-change: bottom; }
 .cookie-banner.show { bottom: 0; }
-
-/* Кастомное меню */
 .custom-context-menu { position: absolute; display: none; background-color: #1e1e1e; border: 1px solid #999; padding: 5px 0; z-index: 2000; font-family: sans-serif; font-size: 14px; }
 .custom-context-menu ul { list-style: none; margin: 0; padding: 0; }
 .custom-context-menu li { padding: 8px 15px; cursor: not-allowed; }
 .custom-context-menu li:hover { background-color: #0078d7; color: white; }
-
-/* Фальшивое окно ошибки Windows XP */
-.fake-error { display: none; position: fixed; top: 25%; left: 30%; width: 400px; border: 2px outset #ececec; background-color: #f0f0f0; color: #000; font-family: 'Tahoma', sans-serif; font-size: 12px; box-shadow: 5px 5px 10px rgba(0,0,0,0.5); z-index: 3000; }
+.fake-error { display: none; position: fixed; top: 25%; left: 30%; width: 400px; border: 2px outset #ececec; background-color: #f0f0f0; color: #000; font-family: 'Tahoma', sans-serif; font-size: 12px; box-shadow: 5px 5px 10px rgba(0,0,0,0.5); z-index: 3000; will-change: top, left; }
 .fake-error-titlebar { background: linear-gradient(to right, #005cda, #0078d7, #4c9aff); color: white; padding: 3px 5px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; }
 .fake-error-titlebar .close-btn { background-color: #d84a2c; border: 1px outset white; color: white; font-weight: bold; width: 18px; height: 18px; padding: 0; line-height: 16px; font-size: 14px; }
 .fake-error-content { padding: 20px; display: flex; align-items: center; position: relative; min-height: 60px; }
 .fake-error-content img { width: 32px; height: 32px; margin-right: 15px; }
 .fake-error-content .ok-btn { position: absolute; bottom: 10px; right: 50%; transform: translateX(50%); padding: 5px 25px; border: 1px solid #999; background-color: #f0f0f0; }
-
-/* Уведомление об обновлении */
-.update-notification {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 350px;
-    background-color: #333;
-    border: 1px solid #555;
-    padding: 15px;
-    box-shadow: 0 0 20px black;
-    z-index: 1001;
-    /* ИСПРАВЛЕНО: Скрываем через transform, а не через right */
-    transform: translateX(150%);
-    transition: transform 0.7s ease-in-out;
-}
-.update-notification.show {
-    /* ИСПРАВЛЕНО: Возвращаем на место */
-    transform: translateX(0);
-}
+.update-notification { position: fixed; bottom: 20px; right: 20px; width: 350px; background-color: #333; border: 1px solid #555; padding: 15px; box-shadow: 0 0 20px black; z-index: 1001; transform: translateX(150%); transition: transform 0.7s ease-in-out; will-change: transform; }
+.update-notification.show { transform: translateX(0); }
 .update-notification button { font-size: 0.9em; padding: 5px 10px; }
-
-/* Бесполезный переключатель */
 .switch-container { display: flex; align-items: center; justify-content: center; margin: 20px 0; }
 .switch { position: relative; display: inline-block; width: 60px; height: 34px; margin-left: 10px;}
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -96,85 +50,37 @@ input:checked + .slider { background-color: #00FF41; }
 input:checked + .slider:before { transform: translateX(26px); }
 .slider.round { border-radius: 34px; }
 .slider.round:before { border-radius: 50%; }
-
-/* Скрепыш (Clippy) */
 .clippy { position: fixed; bottom: 20px; left: 20px; display: none; align-items: flex-end; z-index: 1000; }
 .clippy img { width: 100px; }
 .clippy-bubble { background: #FFFFCC; border: 1px solid black; padding: 15px; border-radius: 10px; margin-left: -20px; margin-bottom: 50px; color: black; font-family: 'Comic Sans MS', sans-serif; font-size: 14px; position: relative; }
 .clippy-bubble::after { content: ''; position: absolute; bottom: -10px; left: 30px; width: 20px; height: 20px; background: #FFFFCC; border-bottom: 1px solid black; border-right: 1px solid black; transform: rotate(45deg); }
 .clippy .close-btn { position: absolute; top: 5px; right: 5px; background: transparent; border: none; font-size: 16px; color: black; cursor: pointer; }
-
-/* Paywall */
 .paywall { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #222; border: 2px solid #555; padding: 25px; z-index: 4000; text-align: center; box-shadow: 0 0 30px black; color: #fff; font-family: sans-serif; }
 .paywall h3 { color: #f00; margin-top: 0; }
-
-/* Фальшивый индикатор загрузки */
 .fake-loader { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 400px; background: #111; padding: 10px; border: 1px solid #444; z-index: 5000; text-align: left; }
 .loader-bar { width: 100%; background-color: #333; height: 20px; }
 .loader-progress { width: 0%; height: 100%; background-color: #00FF41; transition: width 0.1s linear; }
-
-/* Наклон страницы */
-body.tilted { transition: transform 0.5s ease-in-out; transform: rotate(-2deg); }
-/* Внезапная утка */
-.duck { position: fixed; bottom: -200px; left: 10%; z-index: 999; transition: bottom 1s ease-in-out; }
+body.tilted { transition: transform 0.5s ease-in-out; transform: rotate(-2deg); will-change: transform; }
+.duck { position: fixed; bottom: -200px; left: 10%; z-index: 999; transition: bottom 1s ease-in-out; will-change: bottom; }
 .duck.show { bottom: 0; }
-.duck img { width: 150px; animation: rock 2s ease-in-out infinite; }
+.duck img { width: 150px; animation: rock 2s ease-in-out infinite; will-change: transform; }
 @keyframes rock { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-/* Осколки таймера */
 #shatterContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 5000; }
 .particle { position: absolute; background-color: #00FF41; }
 
-
-/*
-============================================================
---- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ( breakpoints < 768px) ---
-============================================================
-*/
 @media (max-width: 768px) {
-    /* Уменьшаем шрифты */
     h1 { font-size: 1.8em; }
-    #timer { 
-        font-size: 13vw; /* Масштабируется по ширине экрана */
-        letter-spacing: 0; 
-    }
-    .cursor { display: none; /* Убираем, чтобы не мешал */ }
+    #timer { font-size: 13vw; letter-spacing: 0; }
+    .cursor { display: none; }
     button { font-size: 1em; padding: 12px 18px; }
-
     .container { padding: 10px; }
-
-    /* Адаптируем все плавающие элементы */
-    .fake-error, 
-    .update-notification, 
-    .fake-loader,
-    .paywall {
-        width: 90vw; /* Занимают 90% ширины экрана */
-        left: 5vw;   /* Центрируем */
-        transform: translate(0, 0); /* Сбрасываем старое центрирование */
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .fake-error { top: 15%; } /* Двигаем повыше */
+    .fake-error, .update-notification, .fake-loader, .paywall { width: 90vw; left: 5vw; transform: translate(0, 0); left: 50%; transform: translateX(-50%); }
+    .fake-error { top: 15%; }
     .paywall { top: 30%; }
-    .update-notification {
-    width: 85vw; /* Занимает 85% ширины экрана */
-    right: 5vw;  /* Отступ 5% справа */
-    bottom: 20px;
-    left: auto;
-    /* Сбрасываем translateX, так как transform уже используется для скрытия/показа */
-    transform: translateX(150%); 
-}
-    
-    /* Уменьшаем и перемещаем Скрепыша, чтобы не мешал */
-    .clippy {
-        transform: scale(0.7);
-        bottom: -15px;
-        left: -20px;
-    }
+    .update-notification { right: 5vw; bottom: 20px; left: auto; transform: translateX(150%); width: 85vw; }
+    .update-notification.show { transform: translateX(0); }
+    .clippy { transform: scale(0.7); bottom: -15px; left: -20px; }
     .clippy-bubble { font-size: 12px; }
-
-    /* Уменьшаем утку */
     .duck img { width: 100px; }
-
-    /* Скрываем баннер cookie, т.к. он занимает много места */
     .cookie-banner { display: none; }
 }
