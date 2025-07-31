@@ -8,17 +8,20 @@
 </head>
 <body>
     <div class="container">
-        <!-- Заголовок, в который будет подставляться счетчик -->
         <h1 id="counter">Андрей пришел вовремя: 0 раз</h1>
-
-        <!-- Таймер, который будет обновляться каждую секунду -->
         <div id="timer">00:00:00:00</div>
         
-        <!-- Кнопка для сброса таймера и увеличения счетчика -->
+        <!-- Основная кнопка -->
         <button id="resetButton">Андрей пришел!</button>
+
+        <!-- НОВАЯ кнопка полного сброса -->
+        <button id="fullResetButton">Сбросить счетчик</button>
     </div>
 
-    <!-- Подключаем файл со скриптами -->
+    <!-- НОВЫЙ скрипт для конфетти (подключаем через CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Наш основной скрипт -->
     <script src="script.js"></script>
 </body>
 </html>
