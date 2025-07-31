@@ -6,7 +6,8 @@ const elements = {};
 ['counter', 'timer', 'resetButton', 'fullResetButton', 'statusMessage',
  'dramaticSound', 'matrixCanvas', 'cookieBanner', 'acceptCookies',
  'customContextMenu', 'fakeError', 'updateNotification', 'uselessSwitch',
- 'clippy', 'paywall', 'closePaywall', 'fakeLoader'].forEach(id => {
+ 'clippy', 'paywall', 'closePaywall', 'fakeLoader', 'shatterContainer',
+ 'duck', 'quackSound', 'xpErrorSound'].forEach(id => {
     elements[id] = document.getElementById(id);
 });
 elements.closeErrorBtn = document.querySelector('#fakeError .close-btn');
@@ -18,8 +19,9 @@ elements.loaderProgress = document.querySelector('.loader-progress');
 let lastResetTime = Date.now();
 let lastDayCount = -1;
 let isTyping = false;
+let godMode = false; // для iddqd
 
-// --- ФУНКЦИИ-ПРИКОЛЫ И ЛОГИКА ---
+// --- ОСНОВНЫЕ ФУНКЦИИ ---
 
 // Хакерский тайпинг
 function typeMessage(element, message) {
@@ -62,16 +64,18 @@ async function fetchDataAndUpdateDisplay() {
     } catch (error) { console.error('Ошибка при загрузке данных:', error); elements.counter.textContent = 'Ошибка загрузки данных'; }
 }
 
-// Обновление таймера
+// Обновление таймера (с режимом бога)
 function updateTimerDisplay() {
-    const elapsedTime = Date.now() - lastResetTime;
+    const now = Date.now();
+    const effectiveTime = godMode ? (lastResetTime - (now - lastResetTime)) : now;
+    const elapsedTime = effectiveTime - lastResetTime;
     const days = Math.floor(elapsedTime / (1000 * 60 * 60 * 24));
+
     if (days !== lastDayCount) {
-        let message = "";
+        let message = "Ожидаем прибытия Андрея...";
         if (days >= 30) { message = "Прошел месяц. Мы уже и забыли, как выглядит Андрей."; }
         else if (days >= 7) { message = "Прошла неделя. Пора высылать поисковую группу."; }
         else if (days >= 1) { message = `Прошло ${days} дня. Андрей, ты где?`; }
-        else { message = "Ожидаем прибытия Андрея..."; }
         if (parseInt(elements.counter.textContent.split(': ')[1] || '1') > 0) { typeMessage(elements.statusMessage, message); }
         lastDayCount = days;
     }
@@ -92,12 +96,13 @@ elements.resetButton.addEventListener('click', async () => {
     try {
         elements.dramaticSound.currentTime = 0;
         elements.dramaticSound.play();
-        const response = await fetch(`${API_URL}/api/reset`, { method: 'POST' });
+        await fetch(`${API_URL}/api/reset`, { method: 'POST' });
         await fetchDataAndUpdateDisplay();
         confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
     } catch (error) { console.error('Ошибка при сбросе таймера:', error); }
     finally { elements.resetButton.disabled = false; }
 });
+
 elements.fullResetButton.addEventListener('click', async () => {
     if (confirm('Вы уверены, что хотите отформатировать систему?')) {
         elements.fullResetButton.disabled = true;
@@ -126,11 +131,45 @@ elements.resetButton.addEventListener('mouseleave', () => {
     elements.resetButton.style.left = '';
 });
 
-// Остальные приколы
+// Разбиваемый таймер
+elements.timer.addEventListener('click', () => {
+    if (typeof html2canvas === 'function' && typeof anime === 'function') {
+        shatterTimer(elements.timer);
+    }
+});
+function shatterTimer(element) {
+    html2canvas(element, { backgroundColor: null }).then(canvas => {
+        element.style.opacity = '0';
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        const particleSize = 4;
+        for (let y = 0; y < canvas.height; y += particleSize) {
+            for (let x = 0; x < canvas.width; x += particleSize) {
+                if (imageData[(y * canvas.width + x) * 4 + 3] > 128) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.width = `${particleSize}px`; particle.style.height = `${particleSize}px`;
+                    const rect = element.getBoundingClientRect();
+                    particle.style.top = `${rect.top + y}px`; particle.style.left = `${rect.left + x}px`;
+                    elements.shatterContainer.appendChild(particle);
+                    anime({ targets: particle, translateX: (Math.random() - 0.5) * 30, translateY: [0, window.innerHeight - rect.top - y], opacity: [1, 0], duration: Math.random() * 1500 + 1000, easing: 'easeInQuad',
+                        complete: () => particle.remove() });
+                }
+            }
+        }
+        setTimeout(() => element.style.opacity = '1', 2500);
+    });
+}
+
+// Баннер Cookie
 if (!localStorage.getItem('cookies_accepted')) { setTimeout(() => elements.cookieBanner.classList.add('show'), 2000); }
 elements.acceptCookies.addEventListener('click', () => { localStorage.setItem('cookies_accepted', 'true'); elements.cookieBanner.classList.remove('show'); });
+
+// Кастомное меню
 document.addEventListener('contextmenu', (e) => { e.preventDefault(); elements.customContextMenu.style.display = 'block'; elements.customContextMenu.style.top = `${e.pageY}px`; elements.customContextMenu.style.left = `${e.pageX}px`; });
 document.addEventListener('click', () => { if (elements.customContextMenu) elements.customContextMenu.style.display = 'none'; });
+
+// Фальшивое окно ошибки (появление и перетаскивание)
 setTimeout(() => { if (elements.fakeError) elements.fakeError.style.display = 'block'; }, Math.random() * 20000 + 10000);
 elements.closeErrorBtn.addEventListener('click', () => elements.fakeError.style.display = 'none');
 elements.okErrorBtn.addEventListener('click', () => elements.fakeError.style.display = 'none');
@@ -141,15 +180,25 @@ if (errorTitleBar) {
     document.addEventListener('mousemove', (e) => { if (isDragging) { elements.fakeError.style.left = `${e.clientX - offsetX}px`; elements.fakeError.style.top = `${e.clientY - offsetY}px`; } });
     document.addEventListener('mouseup', () => isDragging = false);
 }
-setTimeout(() => { if(elements.updateNotification) { elements.updateNotification.classList.add('show'); setTimeout(() => elements.updateNotification.classList.remove('show'), 10000); } }, 25000);
-if(elements.updateNotification) { elements.updateNotification.addEventListener('click', () => elements.updateNotification.classList.remove('show')); }
+
+// Уведомление об обновлении
+setTimeout(() => { if (elements.updateNotification) { elements.updateNotification.classList.add('show'); setTimeout(() => elements.updateNotification.classList.remove('show'), 10000); } }, 25000);
+if (elements.updateNotification) { elements.updateNotification.addEventListener('click', () => elements.updateNotification.classList.remove('show')); }
+
+// Бесполезный переключатель
 elements.uselessSwitch.addEventListener('click', () => { const originalText = elements.statusMessage.textContent; typeMessage(elements.statusMessage, "Этот переключатель ничего не делает. Но вы его нажали."); setTimeout(() => typeMessage(elements.statusMessage, originalText), 4000); });
-setTimeout(() => { if(elements.clippy) elements.clippy.style.display = 'flex'; }, 45000);
+
+// Скрепыш
+setTimeout(() => { if (elements.clippy) elements.clippy.style.display = 'flex'; }, 45000);
 elements.closeClippyBtn.addEventListener('click', () => elements.clippy.style.display = 'none');
-setTimeout(() => { if(elements.paywall) elements.paywall.style.display = 'block'; }, 60000);
+
+// Paywall
+setTimeout(() => { if (elements.paywall) elements.paywall.style.display = 'block'; }, 60000);
 elements.closePaywall.addEventListener('click', () => elements.paywall.style.display = 'none');
+
+// Индикатор загрузки
 setTimeout(() => {
-    if(elements.fakeLoader) {
+    if (elements.fakeLoader) {
         elements.fakeLoader.style.display = 'block';
         let width = 0;
         const interval = setInterval(() => {
@@ -168,6 +217,7 @@ document.addEventListener('keydown', (e) => {
     if (typedKeys.endsWith('matrix')) { activateMatrix(); typedKeys = ''; }
     if (typedKeys.endsWith('chaos')) { document.body.classList.toggle('chaos'); typedKeys = ''; }
     if (typedKeys.endsWith('gravity')) { activateGravity(); typedKeys = ''; }
+    if (typedKeys.endsWith('iddqd')) { typeMessage(elements.statusMessage, 'GOD MODE ACTIVATED'); godMode = true; setTimeout(() => { godMode = false; typeMessage(elements.statusMessage, 'GOD MODE DEACTIVATED'); }, 5000); typedKeys = ''; }
     if (e.key === konamiCode[konamiIndex]) {
         konamiIndex++;
         if (konamiIndex === konamiCode.length) {
@@ -180,19 +230,11 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Функции для секретных кодов
-function activateMatrix() { /* ... код без изменений ... */ }
-function activateGravity() {
-    const elements = Array.from(document.querySelector('.container').children);
-    elements.forEach(el => {
-        el.style.position = 'absolute'; el.style.transition = 'top 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
-        el.style.top = `${window.innerHeight - el.getBoundingClientRect().height}px`; el.style.left = `${el.getBoundingClientRect().left}px`;
-    });
-}
 function activateMatrix() {
     elements.matrixCanvas.style.display = 'block';
     const ctx = elements.matrixCanvas.getContext('2d');
     elements.matrixCanvas.width = window.innerWidth; elements.matrixCanvas.height = window.innerHeight;
-    const letters = 'AБBГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ123456789@#$%^&*()*&^%', fontSize = 16, columns = elements.matrixCanvas.width / fontSize;
+    const letters = 'AБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ123456789@#$%^&*()*&^%', fontSize = 16, columns = elements.matrixCanvas.width / fontSize;
     const drops = [];
     for (let x = 0; x < columns; x++) drops[x] = 1;
     function drawMatrix() {
@@ -207,14 +249,25 @@ function activateMatrix() {
     }
     setInterval(drawMatrix, 33);
 }
+function activateGravity() {
+    const elems = Array.from(document.querySelector('.container').children);
+    elems.forEach(el => {
+        el.style.position = 'absolute';
+        el.style.transition = 'top 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+        el.style.top = `${window.innerHeight - el.getBoundingClientRect().height}px`;
+        el.style.left = `${el.getBoundingClientRect().left}px`;
+    });
+}
 
 // --- ПЕРИОДИЧЕСКИЕ ПРИКОЛЫ ---
-setInterval(() => {
-    if (Math.random() < 0.15) {
-        const fakeAlerts = ["SYSTEM ALERT: Patience levels critical.", "WARNING: Hope module malfunctioning.", "QUERY: Is Andrey a myth?", "LOADING... Still no sign of Andrey.", "ERROR 404: Andrey not found.", "Initiating Plan B: Keep waiting.", "Checking under the couch... No Andrey.", "Ищем Андрея в тени ожиданий.", "Андрей задерживается на неопределённое время.", "Андрей на паузе. Вернётся, когда захочет.", "Current status: Waiting for Andrey...", "Time since last Andrey sighting: ∞", "MISSION FAILED: No Andrey today.", "Он придёт... Наверное.", "Система скучает по Андрею.", "А может, Андрей — это ты?", "WARNING: Андрей испарился в киберпространстве.", "Пока вы ждёте, послушайте немного тишины.", "Уровень ожидания: Критический.", "Андрей снова вышел за хлебом.", "PINGING ANDREY... No response.", "CALCULATING ETA... Undefined.", "Зачем ждать, если можно ждать Андрея?", "Он обещал быть. Мы всё ещё верим.", "AI THINKS: Андрей прячется.", "System Task: Do not lose hope.", "Где-то там... бродит Андрей.", "Если видели Андрея — позвоните нам.", "Сайт живёт только ради него.", "Андрей задержался на уровне бытия.", "Поиск Андрея по альтернативной временной шкале...", "Андрей offline. Но мы надеемся.", "Rebooting reality... Андрей не загрузился.", "Is this Schrödinger’s Andrey?", "We’ve sent a search party. Again.", "Nothing new. Андрей всё ещё не с нами.", "Andrey has been delayed due to plot twists.", "Status: Пропал между строк.", "The prophecy spoke of his coming...", "Uploading... Андрей всё ещё загружается.", "Космос молчит. Андрей тоже.", "Recompiling patience.exe", "Терпение на пределе. Но мы держимся.", "Hope is a dangerous thing for a site like this.", "Андрей скоро? Спросите у звёзд.", "Last seen: в мечтах.", "Сайт создан, чтобы ждать Андрея. Всё остальное — вторично.", "Не паниковать. Просто Андрей забыл про нас.", "ANDREY DETECTED... False alarm.", "System Update: Still waiting.", "Сбой в линии Андрея. Повторите попытку позже.", "Андрей? Алло? Приём?", "We've checked the matrix. Андрей — вне зоны.", "Please insert Андрей to continue.", "Молитвы отправлены. Ответа нет.", "Chrono-syncing... No Андрей in this timeline.", "Пойду сварю чай. Может, к тому времени придёт.", "Андрей в пути. Скорость: 0.01 км/год.", "It's not a bug, it's Андрей.", "Zero Andrey. Maximum vibe.", "Have you tried turning Андрей off and on again?", "ERROR: Time loop detected. Андрей всё ещё не здесь.", "Это ожидание уже стало искусством.", "Ghost of Андрей haunts this server.", "Loading... Но Андрей не грузится.", "Are you Андрей? Please confirm.", "Андрей, ты где, родной?", "System forecast: Cloudy with a chance of Андрей.", "Андрей так и не зашёл в чат.", "Ждали час... Ждём дальше.", "А может, он в отпуске?", "Each second without Андрей — вечность.", "WARNING: User may develop dependency on Андрей.", "Server uptime: 99.99% — Андрей uptime: 0%", "The longer you wait, the stronger he returns.", "Может, он и не существует? Задумайся.", "This is fine. *всё горит*", "Still loading Андрей... Might take a while.", "Your Андрей is in another castle.", "Have faith. Or at least Wi-Fi.", "Time dilation detected: Андрей is late.", "404 Андрей not in this universe.", "Курс рубля стабильнее, чем приход Андрея.", "Всё спокойно... как перед приходом Андрея.", "Подозрительная тишина. Андрей где-то рядом?", "Запахло кофе... но не Андреем.", "Одинокий сервер в ожидании героя.", "Andrey.exe has stopped responding.", "Скоро будет. Наверное. Возможно. Нет.", "Проверка астрала: Андрей не замечен.", "The prophecy delays.", "Not all heroes wear capes. Некоторые просто опаздывают.", "Meanwhile... в мире без Андрея.", "Свет моргает. Может, это знак?", "Такое чувство, что Андрей был только сном.", "Waiting is temporary. Андрей — вечен.", "Андрей, если ты это читаешь — зайди уже."];
-        typeMessage(elements.statusMessage, fakeAlerts[Math.floor(Math.random() * fakeAlerts.length)]);
-    }
-}, 30000);
+// Фальшивые алерты
+setInterval(() => { if (Math.random() < 0.1) { const fakeAlerts = ["SYSTEM ALERT: Patience levels critical.", "WARNING: Hope module malfunctioning.", "QUERY: Is Andrey a myth?", "LOADING... Still no sign of Andrey.", "ERROR 404: Andrey not found.", "Initiating Plan B: Keep waiting.", "Checking under the couch... No Andrey.", "Ищем Андрея в тени ожиданий.", "Андрей задерживается на неопределённое время.", "Андрей на паузе. Вернётся, когда захочет.", "Current status: Waiting for Andrey...", "Time since last Andrey sighting: ∞", "MISSION FAILED: No Andrey today.", "Он придёт... Наверное.", "Система скучает по Андрею.", "А может, Андрей — это ты?", "WARNING: Андрей испарился в киберпространстве.", "Пока вы ждёте, послушайте немного тишины.", "Уровень ожидания: Критический.", "Андрей снова вышел за хлебом.", "PINGING ANDREY... No response.", "CALCULATING ETA... Undefined.", "Зачем ждать, если можно ждать Андрея?", "Он обещал быть. Мы всё ещё верим.", "AI THINKS: Андрей прячется.", "System Task: Do not lose hope.", "Где-то там... бродит Андрей.", "Если видели Андрея — позвоните нам.", "Сайт живёт только ради него.", "Андрей задержался на уровне бытия.", "Поиск Андрея по альтернативной временной шкале...", "Андрей offline. Но мы надеемся.", "Rebooting reality... Андрей не загрузился.", "Is this Schrödinger’s Andrey?", "We’ve sent a search party. Again.", "Nothing new. Андрей всё ещё не с нами.", "Andrey has been delayed due to plot twists.", "Status: Пропал между строк.", "The prophecy spoke of his coming...", "Uploading... Андрей всё ещё загружается.", "Космос молчит. Андрей тоже.", "Recompiling patience.exe", "Терпение на пределе. Но мы держимся.", "Hope is a dangerous thing for a site like this.", "Андрей скоро? Спросите у звёзд.", "Last seen: в мечтах.", "Сайт создан, чтобы ждать Андрея. Всё остальное — вторично.", "Не паниковать. Просто Андрей забыл про нас.", "ANDREY DETECTED... False alarm.", "System Update: Still waiting.", "Сбой в линии Андрея. Повторите попытку позже.", "Андрей? Алло? Приём?", "We've checked the matrix. Андрей — вне зоны.", "Please insert Андрей to continue.", "Молитвы отправлены. Ответа нет.", "Chrono-syncing... No Андрей in this timeline.", "Пойду сварю чай. Может, к тому времени придёт.", "Андрей в пути. Скорость: 0.01 км/год.", "It's not a bug, it's Андрей.", "Zero Andrey. Maximum vibe.", "Have you tried turning Андрей off and on again?", "ERROR: Time loop detected. Андрей всё ещё не здесь.", "Это ожидание уже стало искусством.", "Ghost of Андрей haunts this server.", "Loading... Но Андрей не грузится.", "Are you Андрей? Please confirm.", "Андрей, ты где, родной?", "System forecast: Cloudy with a chance of Андрей.", "Андрей так и не зашёл в чат.", "Ждали час... Ждём дальше.", "А может, он в отпуске?", "Each second without Андрей — вечность.", "WARNING: User may develop dependency on Андрей.", "Server uptime: 99.99% — Андрей uptime: 0%", "The longer you wait, the stronger he returns.", "Может, он и не существует? Задумайся.", "This is fine. *всё горит*", "Still loading Андрей... Might take a while.", "Your Андрей is in another castle.", "Have faith. Or at least Wi-Fi.", "Time dilation detected: Андрей is late.", "404 Андрей not in this universe.", "Курс рубля стабильнее, чем приход Андрея.", "Всё спокойно... как перед приходом Андрея.", "Подозрительная тишина. Андрей где-то рядом?", "Запахло кофе... но не Андреем.", "Одинокий сервер в ожидании героя.", "Andrey.exe has stopped responding.", "Скоро будет. Наверное. Возможно. Нет.", "Проверка астрала: Андрей не замечен.", "The prophecy delays.", "Not all heroes wear capes. Некоторые просто опаздывают.", "Meanwhile... в мире без Андрея.", "Свет моргает. Может, это знак?", "Такое чувство, что Андрей был только сном.", "Waiting is temporary. Андрей — вечен.", "Андрей, если ты это читаешь — зайди уже."]; typeMessage(elements.statusMessage, fakeAlerts[Math.floor(Math.random() * fakeAlerts.length)]); } }, 30000);
+// Наклон страницы
+setInterval(() => { if (Math.random() < 0.1) { document.body.classList.add('tilted'); setTimeout(() => document.body.classList.remove('tilted'), 2000); } }, 40000);
+// Внезапная утка
+setInterval(() => { if (Math.random() < 0.15) { elements.duck.classList.add('show'); elements.quackSound.play(); setTimeout(() => elements.duck.classList.remove('show'), 4000); } }, 50000);
+// Звук ошибки
+setInterval(() => { if (Math.random() < 0.05) { elements.xpErrorSound.play(); } }, 60000);
 
 // --- ЗАПУСК ---
 fetchDataAndUpdateDisplay();
