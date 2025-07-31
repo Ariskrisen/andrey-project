@@ -103,3 +103,32 @@ button:hover {
 .shake {
     animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
 }
+
+/* --- СТИЛИ ДЛЯ НОВЫХ ПРИКОЛОВ --- */
+
+/* Стиль для эффекта "Матрицы" */
+#matrixCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Помещаем за всем контентом */
+    display: none; /* Изначально скрыт */
+}
+
+/* Стиль для кнопки-беглеца */
+#resetButton.runaway {
+    position: relative; /* Чтобы можно было двигать */
+    transition: top 0.2s ease, left 0.2s ease;
+}
+
+/* Стиль для глючного таймера */
+@keyframes glitch {
+  2%,64% { transform: translate(2px,0) skew(0deg); }
+  4%,60% { transform: translate(-2px,0) skew(0deg); }
+  62% { transform: translate(0,0) skew(5deg); }
+}
+#timer.glitch {
+    animation: glitch 1s linear infinite;
+}
