@@ -8,18 +8,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Comic+Sans+MS&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- НОВАЯ БИБЛИОТЕКА ДЛЯ РАЗБИВАНИЯ ТАЙМЕРА -->
+    <!-- Библиотеки для приколов -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 </head>
 <body>
-    <!-- Canvas для эффекта "Матрицы" -->
     <canvas id="matrixCanvas"></canvas>
-    
-    <!-- Контейнер для осколков таймера -->
     <div id="shatterContainer"></div>
 
     <div class="container">
-        <!-- Основной контент -->
         <h1 id="counter">Андрей пришел вовремя: 0 раз</h1>
         <div id="timer-wrapper">
             <div id="timer">00:00:00:00</div>
@@ -35,16 +32,54 @@
     </div>
 
     <!-- --- ПРИКОЛЫ ВНЕ КОНТЕЙНЕРА --- -->
-    <div id="cookieBanner" class="cookie-banner"> /* ... */ </div>
-    <div id="customContextMenu" class="custom-context-menu"> /* ... */ </div>
-    <div id="fakeError" class="fake-error"> /* ... */ </div>
-    <div id="updateNotification" class="update-notification"> /* ... */ </div>
-    <div id="clippy" class="clippy"> <img src="clippy.png" alt="Clippy"> /* ... */ </div>
-    <div id="paywall" class="paywall"> /* ... */ </div>
-    <div id="fakeLoader" class="fake-loader"> /* ... */ </div>
-    
-    <!-- ВНЕЗАПНАЯ УТКА -->
-    <div id="duck" class="duck"><img src="https://www.pngall.com/wp-content/uploads/2016/03/Rubber-Duck-PNG.png" alt="Duck"></div>
+
+    <div id="cookieBanner" class="cookie-banner">
+        <p>Мы используем cookie, чтобы вечно помнить, что Андрей опаздывает. Продолжая, вы соглашаетесь страдать вместе с нами.</p>
+        <button id="acceptCookies">Принять и страдать</button>
+    </div>
+    <div id="customContextMenu" class="custom-context-menu">
+        <ul><li>Позвать Андрея громче</li><li>Отправить поисковый отряд</li><li>Смириться</li></ul>
+    </div>
+    <div id="fakeError" class="fake-error">
+        <div class="fake-error-titlebar">
+            <span>Andrey.exe - Системная ошибка</span>
+            <!-- ИСПРАВЛЕНО: Добавлен class="close-btn" -->
+            <button class="close-btn">X</button>
+        </div>
+        <div class="fake-error-content">
+            <img src="https://www.freeiconspng.com/uploads/error-icon-3.png" alt="Error Icon">
+            <p>Произошел сбой в модуле Andrey.exe.<br><br>Причина: Андрей не найден в указанное время. Повторите попытку завтра. Или никогда.</p>
+            <!-- ИСПРАВЛЕНО: Добавлен class="ok-btn" -->
+            <button class="ok-btn">OK</button>
+        </div>
+    </div>
+    <div id="updateNotification" class="update-notification">
+        <h4>Доступно обновление</h4>
+        <p>Система Ожидания Андрея v1.0 может быть обновлена до v2.0 "Безнадежность".</p>
+        <button>Обновить</button>
+        <button class="remind-later">Напомнить позже</button>
+    </div>
+    <div id="clippy" class="clippy">
+        <img src="clippy.png" alt="Clippy">
+        <div class="clippy-bubble">
+            Похоже, вы ждете Андрея. Хотите совет? Терпение. Больше у меня ничего нет.
+        </div>
+        <!-- ИСПРАВЛЕНО: Добавлен class="close-btn" -->
+        <button class="close-btn">X</button>
+    </div>
+    <div id="paywall" class="paywall">
+        <h3>Требуется оплата</h3>
+        <p>Ваше бесплатное время ожидания истекло. Пожалуйста, внесите 25 копеек, чтобы продолжить.</p>
+        <button id="closePaywall">Нет, я не буду платить за это</button>
+    </div>
+    <div id="fakeLoader" class="fake-loader">
+        <p>Загрузка терпения...</p>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
+    </div>
+    <div id="duck" class="duck">
+        <!-- ИСПРАВЛЕНО: Указан локальный файл duck.png -->
+        <img src="duck.png" alt="Duck">
+    </div>
 
     <!-- --- АУДИО --- -->
     <audio id="dramaticSound" src="dramatic.mp3" preload="auto"></audio>
