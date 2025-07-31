@@ -96,6 +96,47 @@ input:checked + .slider:before { transform: translateX(26px); }
 .loader-bar { width: 100%; background-color: #333; height: 20px; }
 .loader-progress { width: 0%; height: 100%; background-color: #00FF41; transition: width 0.1s linear; }
 
+body.tilted {
+    transition: transform 0.5s ease-in-out;
+    transform: rotate(-2deg);
+}
+
+/* Внезапная утка */
+.duck {
+    position: fixed;
+    bottom: -200px; /* Спрятана внизу */
+    left: 10%;
+    z-index: 999;
+    transition: bottom 1s ease-in-out;
+}
+.duck.show {
+    bottom: 0; /* Выезжает */
+}
+.duck img {
+    width: 150px;
+    animation: rock 2s ease-in-out infinite;
+}
+@keyframes rock {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* Осколки таймера */
+#shatterContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none; /* Чтобы не мешало кликать */
+    z-index: 5000;
+}
+.particle {
+    position: absolute;
+    background-color: #00FF41;
+}
+
 /* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ --- */
 @media (max-width: 600px) {
     h1 { font-size: 1.8em; }
