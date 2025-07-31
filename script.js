@@ -119,17 +119,36 @@ fullResetButton.addEventListener('click', async () => {
     }
 });
 
-// ИСПРАВЛЕННАЯ Кнопка-беглец
+// --- ИСПРАВЛЕННАЯ Кнопка-беглец ---
 resetButton.addEventListener('mouseover', () => {
+    // Шанс побега ~25%
     if (Math.random() > 0.75) {
         resetButton.classList.add('runaway');
-        const containerRect = resetButton.parentElement.getBoundingClientRect();
+        
+        // Родительский контейнер
+        const parent = resetButton.parentElement;
+        const parentRect = parent.getBoundingClientRect();
         const buttonRect = resetButton.getBoundingClientRect();
-        const maxTop = containerRect.height - buttonRect.height;
-        const maxLeft = containerRect.width - buttonRect.width;
-        resetButton.style.top = `${Math.random() * maxTop}px`;
-        resetButton.style.left = `${Math.random() * maxLeft}px`;
+
+        // Максимально возможные координаты, чтобы кнопка не вышла за рамки
+        const maxTop = parentRect.height - buttonRect.height;
+        const maxLeft = parentRect.width - buttonRect.width;
+
+        // Генерируем случайные координаты ВНУТРИ родителя
+        const newTop = Math.random() * maxTop;
+        const newLeft = Math.random() * maxLeft;
+
+        resetButton.style.top = `${newTop}px`;
+        resetButton.style.left = `${newLeft}px`;
     }
+});
+
+// Добавляем "возвращение домой"
+resetButton.addEventListener('mouseleave', () => {
+    // Убираем все стили, чтобы кнопка вернулась на свое место в CSS
+    resetButton.classList.remove('runaway');
+    resetButton.style.top = '';
+    resetButton.style.left = '';
 });
 
 // Баннер Cookie
