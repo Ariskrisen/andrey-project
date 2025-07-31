@@ -1,5 +1,5 @@
 // НАСТРОЙКА: Сюда вы вставите URL вашего сервера после его загрузки на Render
-const API_URL = 'https://your-backend-url.onrender.com'; // <-- ЗАМЕНИТЬ ПОЗЖЕ
+const API_URL = 'https://andrey-project.onrender.com'; // <-- ЗАМЕНИТЬ ПОЗЖЕ
 
 // Находим наши элементы на странице
 const counterElement = document.getElementById('counter');
