@@ -1,8 +1,27 @@
-/* Общие стили */
+/* Звездное небо (чистый CSS) */
+@keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
+@keyframes move-clouds-back { from {background-position:0 0;} to {background-position:10000px 0;} }
+
+#stars, #stars2, #stars3 {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100%;
+    height:100%;
+    display:block;
+    z-index: -1;
+}
+#stars { background:#000 url(https://www.script-tutorials.com/demos/360/images/stars.png) repeat top center; }
+#stars2 { background:transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center; animation:move-twink-back 200s linear infinite; }
+#stars3 { background:transparent url(https://www.script-tutorials.com/demos/360/images/clouds.png) repeat top center; animation:move-clouds-back 200s linear infinite; }
+
+/* Основные стили */
 body {
     background-color: #000;
-    color: #00FF41; /* Ярко-зеленый */
-    font-family: 'VT323', monospace; /* Наш новый пиксельный шрифт */
+    color: #fff;
+    font-family: 'Exo 2', sans-serif; /* Наш новый шрифт */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -10,76 +29,50 @@ body {
     margin: 0;
     text-align: center;
 }
-
-.container {
-    padding: 20px;
-    border: 2px solid #00FF41;
-    box-shadow: 0 0 15px #00FF41; /* Эффект свечения для рамки */
-}
-
-/* Эффект свечения для всего текста */
-h1, #timer, button {
-    text-shadow: 0 0 8px #00FF41;
-}
-
+.container { padding: 20px; }
 h1 {
-    font-size: 3em;
+    font-size: 2.5em;
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.7); /* Голубое свечение */
 }
-
-/* Обертка для таймера и курсора */
-#timer-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 #timer {
-    font-size: 5em;
-    margin: 20px 0;
-    letter-spacing: 4px;
-}
-
-/* Мигающий курсор */
-.cursor {
     font-size: 4em;
-    animation: blink 1s step-end infinite;
-}
-@keyframes blink {
-    from, to { color: transparent }
-    50% { color: #00FF41; }
+    margin: 20px 0;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
 }
 
-/* Стили кнопок */
 button {
     background: transparent;
-    border: 1px solid #00FF41;
-    color: #00FF41;
+    border: 2px solid #00bfff; /* Deep Sky Blue */
+    color: #00bfff;
     padding: 15px 32px;
-    font-size: 1.5em;
-    font-family: 'VT323', monospace;
+    font-size: 1.2em;
+    font-family: 'Exo 2', sans-serif;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    transition: all 0.3s ease;
+    border-radius: 50px; /* Скругленные кнопки */
     margin: 10px;
 }
 
 button:hover {
-    background-color: #00FF41;
+    background-color: #00bfff;
     color: #000;
+    box-shadow: 0 0 20px #00bfff;
 }
 
 #fullResetButton {
-    color: #FF4136; /* Красный для опасного действия */
-    border-color: #FF4136;
+    border-color: #c94c4c;
+    color: #c94c4c;
 }
 #fullResetButton:hover {
-    background-color: #FF4136;
-    color: #000;
+    background-color: #c94c4c;
+    color: #fff;
+    box-shadow: 0 0 20px #c94c4c;
 }
 
 /* Адаптация для мобильных */
 @media (max-width: 600px) {
-    h1 { font-size: 2em; }
-    #timer { font-size: 3em; }
-    .cursor { font-size: 2.5em; }
-    button { font-size: 1.2em; padding: 10px 20px; }
+    h1 { font-size: 1.8em; }
+    #timer { font-size: 2.5em; }
+    button { font-size: 1em; padding: 12px 20px; }
 }
