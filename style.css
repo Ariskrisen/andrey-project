@@ -37,4 +37,21 @@ h1 {
 
 #resetButton:hover {
     background-color: #45a049; /* Цвет кнопки при наведении */
+
+}
+
+#fullResetButton {
+    background-color: #c94c4c; /* Красный цвет для опасного действия */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin-top: 20px; /* Отступ сверху */
+}
+
+#fullResetButton:hover {
+    background-color: #b33e3e;
 }
