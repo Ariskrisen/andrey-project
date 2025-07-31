@@ -1,243 +1,95 @@
-/* Общие стили */
+/* --- ОСНОВНЫЕ СТИЛИ (Ретро-терминал) --- */
 body {
     background-color: #000;
-    color: #00FF41; /* Ярко-зеленый */
-    font-family: 'VT323', monospace; /* Наш новый пиксельный шрифт */
+    color: #00FF41;
+    font-family: 'VT323', monospace;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
     text-align: center;
+    overflow: hidden; /* Чтобы избежать скролла из-за приколов */
 }
+.container { padding: 20px; border: 2px solid #00FF41; box-shadow: 0 0 15px #00FF41; }
+h1, #timer, button { text-shadow: 0 0 8px #00FF41; }
+h1 { font-size: 3em; }
+#timer-wrapper { display: flex; justify-content: center; align-items: center; }
+#timer { font-size: 5em; margin: 20px 0; letter-spacing: 4px; }
+.cursor { font-size: 4em; animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { color: transparent; } }
+button { background: transparent; border: 1px solid #00FF41; color: #00FF41; padding: 15px 32px; font-size: 1.5em; font-family: 'VT323', monospace; cursor: pointer; transition: background-color 0.3s, color 0.3s; margin: 10px; }
+button:hover { background-color: #00FF41; color: #000; }
+#fullResetButton { color: #FF4136; border-color: #FF4136; }
+#fullResetButton:hover { background-color: #FF4136; color: #000; }
 
-.container {
-    padding: 20px;
-    border: 2px solid #00FF41;
-    box-shadow: 0 0 15px #00FF41; /* Эффект свечения для рамки */
-}
+/* --- СТИЛИ ДЛЯ ПРИКОЛОВ --- */
 
-/* Эффект свечения для всего текста */
-h1, #timer, button {
-    text-shadow: 0 0 8px #00FF41;
-}
+/* Сообщение под таймером */
+#statusMessage { margin-top: 15px; font-size: 1.2em; min-height: 20px; color: #FFC300; }
+/* Анимация тряски */
+@keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+.shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+/* Эффект "Матрицы" */
+#matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; display: none; }
+/* Кнопка-беглец */
+#resetButton.runaway { position: relative; transition: top 0.2s ease, left 0.2s ease; }
+/* Глючный таймер */
+@keyframes glitch { 2%,64% { transform: translate(2px,0) skew(0deg); } 4%,60% { transform: translate(-2px,0) skew(0deg); } 62% { transform: translate(0,0) skew(5deg); } }
+#timer.glitch { animation: glitch 1s linear infinite; }
+/* Курсор вечного ожидания */
+body { cursor: wait; }
+/* Баннер Cookie */
+.cookie-banner { position: fixed; bottom: -100px; left: 0; width: 100%; background-color: #1a1a1a; border-top: 2px solid #333; padding: 15px; text-align: center; z-index: 1000; transition: bottom 0.5s ease-in-out; }
+.cookie-banner.show { bottom: 0; }
+.cookie-banner p { margin: 0 0 10px 0; font-size: 1em; }
+/* Кастомное меню */
+.custom-context-menu { position: absolute; display: none; background-color: #1e1e1e; border: 1px solid #999; padding: 5px 0; z-index: 2000; font-family: sans-serif; font-size: 14px; }
+.custom-context-menu ul { list-style: none; margin: 0; padding: 0; }
+.custom-context-menu li { padding: 8px 15px; cursor: not-allowed; }
+.custom-context-menu li:hover { background-color: #0078d7; color: white; }
+/* Фальшивое окно ошибки Windows XP */
+.fake-error { display: none; position: fixed; top: 25%; left: 30%; width: 400px; border: 2px outset #ececec; background-color: #f0f0f0; color: #000; font-family: 'Tahoma', sans-serif; font-size: 12px; box-shadow: 5px 5px 10px rgba(0,0,0,0.5); z-index: 3000; }
+.fake-error-titlebar { background: linear-gradient(to right, #005cda, #0078d7, #4c9aff); color: white; padding: 3px 5px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; }
+.fake-error-titlebar button { background-color: #d84a2c; border: 1px outset white; color: white; font-weight: bold; width: 18px; height: 18px; padding: 0; line-height: 16px; font-size: 14px; }
+.fake-error-content { padding: 20px; display: flex; align-items: center; position: relative; min-height: 60px; }
+.fake-error-content img { width: 32px; height: 32px; margin-right: 15px; }
+.fake-error-content button { position: absolute; bottom: 10px; right: 50%; transform: translateX(50%); padding: 5px 25px; border: 1px solid #999; background-color: #f0f0f0; }
+/* "Сломанный" счетчик */
+#counter.over9000 { color: #FF00FF; animation: pulse 1s infinite; }
+@keyframes pulse { 0% { transform: scale(1); text-shadow: 0 0 10px #FF00FF; } 50% { transform: scale(1.1); text-shadow: 0 0 25px #FF00FF; } 100% { transform: scale(1); text-shadow: 0 0 10px #FF00FF; } }
+/* Фальшивое уведомление */
+.update-notification { position: fixed; bottom: 20px; right: -400px; width: 350px; background-color: #333; border: 1px solid #555; padding: 15px; box-shadow: 0 0 20px black; z-index: 1001; transition: right 0.7s ease-in-out; }
+.update-notification.show { right: 20px; }
+.update-notification h4 { margin-top: 0; }
+.update-notification button { font-size: 0.9em; padding: 5px 10px; }
+.update-notification .remind-later { background: transparent; color: #999; }
+/* Бесполезный переключатель */
+.switch-container { display: flex; align-items: center; justify-content: center; margin: 20px 0; }
+.switch { position: relative; display: inline-block; width: 60px; height: 34px; margin-left: 10px;}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: #00FF41; }
+input:checked + .slider:before { transform: translateX(26px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+/* Режим "Хаос" */
+body.chaos { filter: invert(1); background-color: #fff; }
+body.chaos img, body.chaos canvas { filter: invert(1); }
+/* Помощник-Скрепыш */
+.clippy { position: fixed; bottom: 20px; left: 20px; display: none; align-items: flex-end; z-index: 1000; }
+.clippy img { width: 100px; }
+.clippy-bubble { background: #FFFFCC; border: 1px solid black; padding: 15px; border-radius: 10px; margin-left: -20px; margin-bottom: 50px; color: black; font-family: 'Comic Sans MS', sans-serif; font-size: 14px; position: relative; }
+.clippy-bubble::after { content: ''; position: absolute; bottom: -10px; left: 30px; width: 20px; height: 20px; background: #FFFFCC; border-bottom: 1px solid black; border-right: 1px solid black; transform: rotate(45deg); }
+#closeClippy { position: absolute; top: 5px; right: 5px; background: transparent; border: none; font-size: 16px; color: black; cursor: pointer; }
 
-h1 {
-    font-size: 3em;
-}
-
-/* Обертка для таймера и курсора */
-#timer-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#timer {
-    font-size: 5em;
-    margin: 20px 0;
-    letter-spacing: 4px;
-}
-
-/* Мигающий курсор */
-.cursor {
-    font-size: 4em;
-    animation: blink 1s step-end infinite;
-}
-@keyframes blink {
-    from, to { color: transparent }
-    50% { color: #00FF41; }
-}
-
-/* Стили кнопок */
-button {
-    background: transparent;
-    border: 1px solid #00FF41;
-    color: #00FF41;
-    padding: 15px 32px;
-    font-size: 1.5em;
-    font-family: 'VT323', monospace;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    margin: 10px;
-}
-
-button:hover {
-    background-color: #00FF41;
-    color: #000;
-}
-
-#fullResetButton {
-    color: #FF4136; /* Красный для опасного действия */
-    border-color: #FF4136;
-}
-#fullResetButton:hover {
-    background-color: #FF4136;
-    color: #000;
-}
-
-/* Адаптация для мобильных */
+/* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ --- */
 @media (max-width: 600px) {
     h1 { font-size: 2em; }
     #timer { font-size: 3em; }
     .cursor { font-size: 2.5em; }
     button { font-size: 1.2em; padding: 10px 20px; }
-}
-
-/* Стиль для сообщения под таймером */
-#statusMessage {
-    margin-top: 15px;
-    font-size: 1.2em;
-    min-height: 20px; /* Чтобы контейнер не прыгал при смене текста */
-    color: #FFC300; /* Желтый цвет для привлечения внимания */
-}
-
-/* Анимация для эффекта тряски */
-@keyframes shake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
-}
-
-.shake {
-    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-/* --- СТИЛИ ДЛЯ НОВЫХ ПРИКОЛОВ --- */
-
-/* Стиль для эффекта "Матрицы" */
-#matrixCanvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Помещаем за всем контентом */
-    display: none; /* Изначально скрыт */
-}
-
-/* Стиль для кнопки-беглеца */
-#resetButton.runaway {
-    position: relative; /* Чтобы можно было двигать */
-    transition: top 0.2s ease, left 0.2s ease;
-}
-
-/* Стиль для глючного таймера */
-@keyframes glitch {
-  2%,64% { transform: translate(2px,0) skew(0deg); }
-  4%,60% { transform: translate(-2px,0) skew(0deg); }
-  62% { transform: translate(0,0) skew(5deg); }
-}
-#timer.glitch {
-    animation: glitch 1s linear infinite;
-}
-
-/* --- СТИЛИ ДЛЯ ПАКЕТА БЕЗУМИЯ --- */
-
-/* Прикол №3: Курсор вечного ожидания */
-body {
-    cursor: wait;
-}
-
-/* Прикол №1: Баннер Cookie */
-.cookie-banner {
-    position: fixed;
-    bottom: -100px; /* Изначально спрятан */
-    left: 0;
-    width: 100%;
-    background-color: #1a1a1a;
-    border-top: 2px solid #333;
-    padding: 15px;
-    text-align: center;
-    z-index: 1000;
-    transition: bottom 0.5s ease-in-out;
-}
-.cookie-banner.show {
-    bottom: 0;
-}
-.cookie-banner p {
-    margin: 0 0 10px 0;
-    font-size: 1em;
-}
-
-/* Прикол №2: Кастомное меню */
-.custom-context-menu {
-    position: absolute;
-    display: none;
-    background-color: #1e1e1e;
-    border: 1px solid #999;
-    padding: 5px 0;
-    z-index: 2000;
-    font-family: sans-serif; /* Обычный шрифт для "системности" */
-    font-size: 14px;
-}
-.custom-context-menu ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-.custom-context-menu li {
-    padding: 8px 15px;
-    cursor: not-allowed; /* Курсор "запрещено" */
-}
-.custom-context-menu li:hover {
-    background-color: #0078d7;
-    color: white;
-}
-
-/* Прикол №4: Фальшивое окно ошибки Windows XP */
-.fake-error {
-    display: none; /* Изначально скрыто */
-    position: fixed;
-    top: 25%;
-    left: 30%;
-    width: 400px;
-    border: 2px outset #ececec;
-    background-color: #f0f0f0;
-    color: #000;
-    font-family: 'Tahoma', sans-serif;
-    font-size: 12px;
-    box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
-    z-index: 3000;
-}
-.fake-error-titlebar {
-    background: linear-gradient(to right, #005cda, #0078d7, #4c9aff);
-    color: white;
-    padding: 3px 5px;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: move; /* Курсор для перетаскивания */
-}
-.fake-error-titlebar button {
-    background-color: #d84a2c;
-    border: 1px outset white;
-    color: white;
-    font-weight: bold;
-    width: 18px;
-    height: 18px;
-    padding: 0;
-    line-height: 16px;
-    font-family: 'Webdings', 'Wingdings'; /* Шрифты с иконками */
-    font-size: 14px;
-}
-.fake-error-content {
-    padding: 20px;
-    display: flex;
-    align-items: center;
-}
-.fake-error-content img {
-    width: 32px;
-    height: 32px;
-    margin-right: 15px;
-}
-.fake-error-content button {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    padding: 5px 15px;
-    border: 1px solid #999;
-    background-color: #f0f0f0;
+    .container { padding: 10px; }
+    .fake-error { width: 90%; left: 5%; }
 }
