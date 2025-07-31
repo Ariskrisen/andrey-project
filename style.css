@@ -1,7 +1,8 @@
+/* Общие стили */
 body {
-    background-color: #121212; /* Черный фон */
-    color: #ffffff;           /* Белый текст */
-    font-family: 'Courier New', Courier, monospace; /* "Компьютерный" шрифт */
+    background-color: #000;
+    color: #00FF41; /* Ярко-зеленый */
+    font-family: 'VT323', monospace; /* Наш новый пиксельный шрифт */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,46 +13,73 @@ body {
 
 .container {
     padding: 20px;
+    border: 2px solid #00FF41;
+    box-shadow: 0 0 15px #00FF41; /* Эффект свечения для рамки */
+}
+
+/* Эффект свечения для всего текста */
+h1, #timer, button {
+    text-shadow: 0 0 8px #00FF41;
 }
 
 h1 {
-    font-size: 2.5em; /* Размер заголовка */
+    font-size: 3em;
+}
+
+/* Обертка для таймера и курсора */
+#timer-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #timer {
-    font-size: 4em;   /* Размер таймера */
+    font-size: 5em;
     margin: 20px 0;
-    letter-spacing: 2px; /* Расстояние между символами */
+    letter-spacing: 4px;
 }
 
-#resetButton {
-    background-color: #4CAF50; /* Зеленый цвет кнопки */
-    color: white;
-    border: none;
+/* Мигающий курсор */
+.cursor {
+    font-size: 4em;
+    animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+    from, to { color: transparent }
+    50% { color: #00FF41; }
+}
+
+/* Стили кнопок */
+button {
+    background: transparent;
+    border: 1px solid #00FF41;
+    color: #00FF41;
     padding: 15px 32px;
-    font-size: 1.2em;
-    cursor: pointer; /* Указатель мыши в виде руки при наведении */
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    font-size: 1.5em;
+    font-family: 'VT323', monospace;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    margin: 10px;
 }
 
-#resetButton:hover {
-    background-color: #45a049; /* Цвет кнопки при наведении */
-
+button:hover {
+    background-color: #00FF41;
+    color: #000;
 }
 
 #fullResetButton {
-    background-color: #c94c4c; /* Красный цвет для опасного действия */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 0.9em;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    margin-top: 20px; /* Отступ сверху */
+    color: #FF4136; /* Красный для опасного действия */
+    border-color: #FF4136;
+}
+#fullResetButton:hover {
+    background-color: #FF4136;
+    color: #000;
 }
 
-#fullResetButton:hover {
-    background-color: #b33e3e;
+/* Адаптация для мобильных */
+@media (max-width: 600px) {
+    h1 { font-size: 2em; }
+    #timer { font-size: 3em; }
+    .cursor { font-size: 2.5em; }
+    button { font-size: 1.2em; padding: 10px 20px; }
 }
