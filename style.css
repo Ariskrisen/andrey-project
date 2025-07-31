@@ -1,27 +1,8 @@
-/* Звездное небо (чистый CSS) */
-@keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
-@keyframes move-clouds-back { from {background-position:0 0;} to {background-position:10000px 0;} }
-
-#stars, #stars2, #stars3 {
-    position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100%;
-    height:100%;
-    display:block;
-    z-index: -1;
-}
-#stars { background:#000 url(https://www.script-tutorials.com/demos/360/images/stars.png) repeat top center; }
-#stars2 { background:transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center; animation:move-twink-back 200s linear infinite; }
-#stars3 { background:transparent url(https://www.script-tutorials.com/demos/360/images/clouds.png) repeat top center; animation:move-clouds-back 200s linear infinite; }
-
-/* Основные стили */
+/* Общие стили */
 body {
     background-color: #000;
-    color: #fff;
-    font-family: 'Exo 2', sans-serif; /* Наш новый шрифт */
+    color: #00FF41; /* Ярко-зеленый */
+    font-family: 'VT323', monospace; /* Наш новый пиксельный шрифт */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -29,50 +10,96 @@ body {
     margin: 0;
     text-align: center;
 }
-.container { padding: 20px; }
-h1 {
-    font-size: 2.5em;
-    text-shadow: 0 0 10px rgba(0, 191, 255, 0.7); /* Голубое свечение */
-}
-#timer {
-    font-size: 4em;
-    margin: 20px 0;
-    letter-spacing: 2px;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+
+.container {
+    padding: 20px;
+    border: 2px solid #00FF41;
+    box-shadow: 0 0 15px #00FF41; /* Эффект свечения для рамки */
 }
 
+/* Эффект свечения для всего текста */
+h1, #timer, button {
+    text-shadow: 0 0 8px #00FF41;
+}
+
+h1 {
+    font-size: 3em;
+}
+
+/* Обертка для таймера и курсора */
+#timer-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#timer {
+    font-size: 5em;
+    margin: 20px 0;
+    letter-spacing: 4px;
+}
+
+/* Мигающий курсор */
+.cursor {
+    font-size: 4em;
+    animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+    from, to { color: transparent }
+    50% { color: #00FF41; }
+}
+
+/* Стили кнопок */
 button {
     background: transparent;
-    border: 2px solid #00bfff; /* Deep Sky Blue */
-    color: #00bfff;
+    border: 1px solid #00FF41;
+    color: #00FF41;
     padding: 15px 32px;
-    font-size: 1.2em;
-    font-family: 'Exo 2', sans-serif;
+    font-size: 1.5em;
+    font-family: 'VT323', monospace;
     cursor: pointer;
-    transition: all 0.3s ease;
-    border-radius: 50px; /* Скругленные кнопки */
+    transition: background-color 0.3s, color 0.3s;
     margin: 10px;
 }
 
 button:hover {
-    background-color: #00bfff;
+    background-color: #00FF41;
     color: #000;
-    box-shadow: 0 0 20px #00bfff;
 }
 
 #fullResetButton {
-    border-color: #c94c4c;
-    color: #c94c4c;
+    color: #FF4136; /* Красный для опасного действия */
+    border-color: #FF4136;
 }
 #fullResetButton:hover {
-    background-color: #c94c4c;
-    color: #fff;
-    box-shadow: 0 0 20px #c94c4c;
+    background-color: #FF4136;
+    color: #000;
 }
 
 /* Адаптация для мобильных */
 @media (max-width: 600px) {
-    h1 { font-size: 1.8em; }
-    #timer { font-size: 2.5em; }
-    button { font-size: 1em; padding: 12px 20px; }
+    h1 { font-size: 2em; }
+    #timer { font-size: 3em; }
+    .cursor { font-size: 2.5em; }
+    button { font-size: 1.2em; padding: 10px 20px; }
+}
+
+/* Стиль для сообщения под таймером */
+#statusMessage {
+    margin-top: 15px;
+    font-size: 1.2em;
+    min-height: 20px; /* Чтобы контейнер не прыгал при смене текста */
+    color: #FFC300; /* Желтый цвет для привлечения внимания */
+}
+
+/* Анимация для эффекта тряски */
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+.shake {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
 }
