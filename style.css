@@ -11,7 +11,7 @@ body {
     text-align: center;
     overflow: hidden; /* Чтобы избежать скролла из-за приколов */
 }
-.container { padding: 20px; border: 2px solid #00FF41; box-shadow: 0 0 15px #00FF41; }
+.container { padding: 20px; border: 2px solid #00FF41; box-shadow: 0 0 15px #00FF41; position: relative; }
 h1, #timer, button { text-shadow: 0 0 8px #00FF41; }
 h1 { font-size: 3em; }
 #timer-wrapper { display: flex; justify-content: center; align-items: center; }
@@ -33,7 +33,7 @@ button:hover { background-color: #00FF41; color: #000; }
 /* Эффект "Матрицы" */
 #matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; display: none; }
 /* Кнопка-беглец */
-#resetButton.runaway { position: relative; transition: top 0.2s ease, left 0.2s ease; }
+#resetButton.runaway { position: absolute; transition: top 0.2s ease, left 0.2s ease; }
 /* Глючный таймер */
 @keyframes glitch { 2%,64% { transform: translate(2px,0) skew(0deg); } 4%,60% { transform: translate(-2px,0) skew(0deg); } 62% { transform: translate(0,0) skew(5deg); } }
 #timer.glitch { animation: glitch 1s linear infinite; }
