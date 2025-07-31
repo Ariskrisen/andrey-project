@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Таймер Андрея</title>
+    <!-- Подключаем пиксельный шрифт с Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h1 id="counter">Андрей пришел вовремя: 0 раз</h1>
-        <div id="timer">00:00:00:00</div>
-        
-        <!-- Основная кнопка -->
-        <button id="resetButton">Андрей пришел!</button>
-
-        <!-- НОВАЯ кнопка полного сброса -->
-        <button id="fullResetButton">Сбросить счетчик</button>
+        <div id="timer-wrapper">
+            <div id="timer">00:00:00:00</div>
+            <div class="cursor">_</div> <!-- Мигающий курсор -->
+        </div>
+        <button id="resetButton">[ Андрей прибыл ]</button>
+        <button id="fullResetButton">[ Форматировать систему ]</button>
     </div>
 
-    <!-- НОВЫЙ скрипт для конфетти (подключаем через CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-
-    <!-- Наш основной скрипт -->
     <script src="script.js"></script>
 </body>
 </html>
