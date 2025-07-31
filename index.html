@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Таймер Андрея</title>
+    <link rel="icon" type="image/png" href="favicon.png"> <!-- Не забудьте добавить иконку, если хотите -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Exo+2:wght@400;700&family=Comic+Sans+MS&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Canvas для эффекта "Матрицы" -->
     <canvas id="matrixCanvas"></canvas>
 
     <div class="container">
@@ -20,19 +22,29 @@
             <div class="cursor">_</div>
         </div>
         <p id="statusMessage">Ожидаем прибытия...</p>
+
+        <!-- Бесполезный переключатель -->
+        <div class="switch-container">
+            <span>Режим Турбо-Ожидания</span>
+            <label class="switch">
+                <input type="checkbox" id="uselessSwitch">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
         <button id="resetButton">[ Андрей прибыл ]</button>
         <button id="fullResetButton">[ Форматировать систему ]</button>
     </div>
 
-    <!-- --- НОВЫЕ ЭЛЕМЕНТЫ ДЛЯ ПРИКОЛОВ --- -->
+    <!-- --- ПРИКОЛЫ ВНЕ КОНТЕЙНЕРА --- -->
 
-    <!-- Прикол №1: Баннер Cookie -->
+    <!-- Баннер Cookie -->
     <div id="cookieBanner" class="cookie-banner">
         <p>Мы используем cookie, чтобы вечно помнить, что Андрей опаздывает. Продолжая, вы соглашаетесь страдать вместе с нами.</p>
         <button id="acceptCookies">Принять и страдать</button>
     </div>
 
-    <!-- Прикол №2: Кастомное меню -->
+    <!-- Кастомное меню -->
     <div id="customContextMenu" class="custom-context-menu">
         <ul>
             <li>Позвать Андрея громче</li>
@@ -41,7 +53,7 @@
         </ul>
     </div>
 
-    <!-- Прикол №4: Фальшивое окно ошибки -->
+    <!-- Фальшивое окно ошибки -->
     <div id="fakeError" class="fake-error">
         <div class="fake-error-titlebar">
             <span>Andrey.exe - Системная ошибка</span>
@@ -54,9 +66,27 @@
         </div>
     </div>
 
-    <!-- --- КОНЕЦ НОВЫХ ЭЛЕМЕНТОВ --- -->
+    <!-- Фальшивое уведомление об обновлении -->
+    <div id="updateNotification" class="update-notification">
+        <h4>Доступно обновление</h4>
+        <p>Система Ожидания Андрея v1.0 может быть обновлена до v2.0 "Безнадежность".</p>
+        <button>Обновить</button>
+        <button class="remind-later">Напомнить позже</button>
+    </div>
 
+    <!-- Помощник-Скрепыш -->
+    <div id="clippy" class="clippy">
+        <img src="https://archive.org/download/clippy-sprite/clippy.png" alt="Clippy">
+        <div class="clippy-bubble">
+            Похоже, вы ждете Андрея. Хотите совет? Терпение. Больше у меня ничего нет.
+        </div>
+        <button id="closeClippy">X</button>
+    </div>
+
+    <!-- Аудио элемент для звука -->
     <audio id="dramaticSound" src="dramatic.mp3" preload="auto"></audio>
+
+    <!-- Подключение скриптов -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
