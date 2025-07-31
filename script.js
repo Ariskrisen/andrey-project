@@ -1,5 +1,5 @@
 // УБЕДИТЕСЬ, ЧТО ЗДЕСЬ ВАШ ПРАВИЛЬНЫЙ URL С RENDER.COM
-const API_URL = 'https://andrey-timer-backend.onrender.com'; // Используйте ваш URL!
+const API_URL = 'https://andrey-project.onrender.com'; // Используйте ваш URL!
 
 // Находим все элементы на странице
 const counterElement = document.getElementById('counter');
