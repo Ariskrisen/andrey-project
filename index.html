@@ -10,10 +10,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Canvas для эффекта "Матрицы" -->
     <canvas id="matrixCanvas"></canvas>
 
     <div class="container">
+        <!-- Основной контент -->
         <h1 id="counter">Андрей пришел вовремя: 0 раз</h1>
         <div id="timer-wrapper">
             <div id="timer">00:00:00:00</div>
@@ -24,9 +24,39 @@
         <button id="fullResetButton">[ Форматировать систему ]</button>
     </div>
 
-    <!-- НОВЫЙ АУДИО ЭЛЕМЕНТ. Он будет невидимым. -->
-    <audio id="dramaticSound" src="dramatic.mp3" preload="auto"></audio>
+    <!-- --- НОВЫЕ ЭЛЕМЕНТЫ ДЛЯ ПРИКОЛОВ --- -->
 
+    <!-- Прикол №1: Баннер Cookie -->
+    <div id="cookieBanner" class="cookie-banner">
+        <p>Мы используем cookie, чтобы вечно помнить, что Андрей опаздывает. Продолжая, вы соглашаетесь страдать вместе с нами.</p>
+        <button id="acceptCookies">Принять и страдать</button>
+    </div>
+
+    <!-- Прикол №2: Кастомное меню -->
+    <div id="customContextMenu" class="custom-context-menu">
+        <ul>
+            <li>Позвать Андрея громче</li>
+            <li>Отправить поисковый отряд</li>
+            <li>Смириться</li>
+        </ul>
+    </div>
+
+    <!-- Прикол №4: Фальшивое окно ошибки -->
+    <div id="fakeError" class="fake-error">
+        <div class="fake-error-titlebar">
+            <span>Andrey.exe - Системная ошибка</span>
+            <button id="closeError">X</button>
+        </div>
+        <div class="fake-error-content">
+            <img src="https://www.freeiconspng.com/uploads/error-icon-3.png" alt="Error Icon">
+            <p>Произошел сбой в модуле Andrey.exe.<br><br>Причина: Андрей не найден в указанное время. Повторите попытку завтра. Или никогда.</p>
+            <button id="okError">OK</button>
+        </div>
+    </div>
+
+    <!-- --- КОНЕЦ НОВЫХ ЭЛЕМЕНТОВ --- -->
+
+    <audio id="dramaticSound" src="dramatic.mp3" preload="auto"></audio>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
