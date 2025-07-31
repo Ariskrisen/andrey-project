@@ -9,7 +9,8 @@ body {
     height: 100vh;
     margin: 0;
     text-align: center;
-    overflow: hidden;
+    overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
+    overflow-y: auto;   /* Разрешаем вертикальный скролл, если понадобится */
 }
 .container { padding: 20px; border: 2px solid #00FF41; box-shadow: 0 0 15px #00FF41; position: relative; }
 h1, #timer, button { text-shadow: 0 0 8px #00FF41; }
@@ -96,54 +97,61 @@ input:checked + .slider:before { transform: translateX(26px); }
 .loader-bar { width: 100%; background-color: #333; height: 20px; }
 .loader-progress { width: 0%; height: 100%; background-color: #00FF41; transition: width 0.1s linear; }
 
-body.tilted {
-    transition: transform 0.5s ease-in-out;
-    transform: rotate(-2deg);
-}
-
+/* Наклон страницы */
+body.tilted { transition: transform 0.5s ease-in-out; transform: rotate(-2deg); }
 /* Внезапная утка */
-.duck {
-    position: fixed;
-    bottom: -200px; /* Спрятана внизу */
-    left: 10%;
-    z-index: 999;
-    transition: bottom 1s ease-in-out;
-}
-.duck.show {
-    bottom: 0; /* Выезжает */
-}
-.duck img {
-    width: 150px;
-    animation: rock 2s ease-in-out infinite;
-}
-@keyframes rock {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
-}
-
+.duck { position: fixed; bottom: -200px; left: 10%; z-index: 999; transition: bottom 1s ease-in-out; }
+.duck.show { bottom: 0; }
+.duck img { width: 150px; animation: rock 2s ease-in-out infinite; }
+@keyframes rock { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
 /* Осколки таймера */
-#shatterContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none; /* Чтобы не мешало кликать */
-    z-index: 5000;
-}
-.particle {
-    position: absolute;
-    background-color: #00FF41;
-}
+#shatterContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 5000; }
+.particle { position: absolute; background-color: #00FF41; }
 
-/* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ --- */
-@media (max-width: 600px) {
+
+/*
+============================================================
+--- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ( breakpoints < 768px) ---
+============================================================
+*/
+@media (max-width: 768px) {
+    /* Уменьшаем шрифты */
     h1 { font-size: 1.8em; }
-    #timer { font-size: 2.5em; }
-    .cursor { display: none; }
-    button { font-size: 1em; padding: 12px 20px; }
+    #timer { 
+        font-size: 13vw; /* Масштабируется по ширине экрана */
+        letter-spacing: 0; 
+    }
+    .cursor { display: none; /* Убираем, чтобы не мешал */ }
+    button { font-size: 1em; padding: 12px 18px; }
+
     .container { padding: 10px; }
-    .fake-error, .update-notification, .fake-loader { width: 90%; left: 5%; transform: translateX(0); }
-    .clippy { transform: scale(0.8); left: -10px; bottom: -10px; }
+
+    /* Адаптируем все плавающие элементы */
+    .fake-error, 
+    .update-notification, 
+    .fake-loader,
+    .paywall {
+        width: 90vw; /* Занимают 90% ширины экрана */
+        left: 5vw;   /* Центрируем */
+        transform: translate(0, 0); /* Сбрасываем старое центрирование */
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .fake-error { top: 15%; } /* Двигаем повыше */
+    .paywall { top: 30%; }
+    .update-notification { right: 5vw; bottom: 20px; left: auto; transform: none; width: 80vw;} /* Перемещаем в угол */
+    
+    /* Уменьшаем и перемещаем Скрепыша, чтобы не мешал */
+    .clippy {
+        transform: scale(0.7);
+        bottom: -15px;
+        left: -20px;
+    }
+    .clippy-bubble { font-size: 12px; }
+
+    /* Уменьшаем утку */
+    .duck img { width: 100px; }
+
+    /* Скрываем баннер cookie, т.к. он занимает много места */
+    .cookie-banner { display: none; }
 }
