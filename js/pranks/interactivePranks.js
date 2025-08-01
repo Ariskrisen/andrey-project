@@ -57,12 +57,14 @@ let isShattering = false;
 function shatterTimer(element) {
     if (isShattering || !element || typeof html2canvas !== 'function' || typeof anime !== 'function' || element.style.opacity === '0') return;
     isShattering = true;
+    
+    // ИСПРАВЛЕНО: Получаем точные координаты таймера на странице
+    const rect = element.getBoundingClientRect();
+
     html2canvas(element, { backgroundColor: null }).then(canvas => {
         element.style.opacity = '0';
         const ctx = canvas.getContext('2d');
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        
-        // ИСПРАВЛЕНО: Уменьшаем количество частиц для производительности
         const particleSize = 8;
         
         for (let y = 0; y < canvas.height; y += particleSize) {
@@ -72,14 +74,16 @@ function shatterTimer(element) {
                     particle.className = 'particle';
                     particle.style.width = `${particleSize}px`;
                     particle.style.height = `${particleSize}px`;
-                    const rect = element.getBoundingClientRect();
+                    // ИСПРАВЛЕНО: Позиционируем осколки точно там, где был таймер
+                    particle.style.position = 'fixed';
                     particle.style.top = `${rect.top + y}px`;
                     particle.style.left = `${rect.left + x}px`;
                     elements.shatterContainer.appendChild(particle);
+                    
                     anime({
                         targets: particle,
-                        translateX: (Math.random() - 0.5) * 30,
-                        translateY: [0, window.innerHeight - rect.top - y],
+                        translateX: (Math.random() - 0.5) * 40,
+                        translateY: [0, window.innerHeight - rect.top - y + 50], // Падают чуть ниже экрана
                         opacity: [1, 0],
                         duration: Math.random() * 1500 + 1000,
                         easing: 'easeInQuad',
@@ -91,6 +95,7 @@ function shatterTimer(element) {
         setTimeout(() => { element.style.opacity = '1'; isShattering = false; }, 2500);
     });
 }
+
 
 function setupDragAndDrop() {
     const errorTitleBar = document.querySelector('.fake-error-titlebar');

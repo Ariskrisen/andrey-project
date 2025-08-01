@@ -33,25 +33,34 @@ function activateMatrix() {
 function activateGravity() {
     const container = document.querySelector('.container');
     if (!container) return;
-    const elems = Array.from(container.children);
-    elems.forEach(el => {
-        const clone = el.cloneNode(true);
-        const rect = el.getBoundingClientRect();
-        clone.style.position = 'fixed';
-        clone.style.left = `${rect.left}px`;
-        clone.style.top = `${rect.top}px`;
-        clone.style.margin = '0';
-        clone.style.zIndex = '9999';
-        document.body.appendChild(clone);
-        
-        anime({
-            targets: clone,
-            top: window.innerHeight,
-            rotate: (Math.random() - 0.5) * 720,
-            easing: 'easeInCubic',
-            duration: 2000,
-            complete: () => clone.remove()
-        });
+
+    // ИСПРАВЛЕНО: Делаем копию всего контейнера, а не отдельных элементов
+    const containerClone = container.cloneNode(true);
+    const rect = container.getBoundingClientRect();
+
+    // Стилизуем клон, чтобы он выглядел так же и был на том же месте
+    containerClone.style.position = 'fixed';
+    containerClone.style.left = `${rect.left}px`;
+    containerClone.style.top = `${rect.top}px`;
+    containerClone.style.margin = '0';
+    containerClone.style.zIndex = '9999';
+    document.body.appendChild(containerClone);
+    
+    // Прячем оригинал
+    container.style.opacity = '0';
+
+    // Анимируем падение и вращение клона
+    anime({
+        targets: containerClone,
+        top: window.innerHeight,
+        rotate: (Math.random() - 0.5) * 90, // Меньше вращения для реализма
+        easing: 'easeInCubic',
+        duration: 2000,
+        complete: () => {
+            // Удаляем клон и возвращаем оригинал
+            containerClone.remove();
+            container.style.opacity = '1';
+        }
     });
 }
 

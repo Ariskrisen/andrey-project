@@ -88,8 +88,25 @@ body.chaos img, body.chaos canvas, body.chaos .particle { filter: invert(1); }
 .custom-context-menu li:hover { background-color: #0078d7; color: white; }
 
 /* Плавающие окна и баннеры (с исправлениями) */
-.cookie-banner { position: fixed; bottom: -150px; left: 0; width: 100%; background-color: #1a1a1a; border-top: 2px solid #333; padding: 15px; box-sizing: border-box; text-align: center; z-index: 1000; transition: bottom 0.5s ease-in-out; will-change: bottom; }
-.cookie-banner.show { bottom: 0; }
+.cookie-banner {
+    position: fixed;
+    bottom: 0; /* Теперь всегда внизу */
+    left: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    border-top: 2px solid #333;
+    padding: 15px;
+    box-sizing: border-box;
+    text-align: center;
+    z-index: 1000;
+    /* ИСПРАВЛЕНО: Скрываем с помощью transform */
+    transform: translateY(100%);
+    transition: transform 0.5s ease-in-out;
+    will-change: transform;
+}
+.cookie-banner.show {
+    transform: translateY(0); /* Показываем */
+}
 .cookie-banner p { margin: 0 0 10px 0; font-size: 1em; }
 .fake-error { display: none; position: fixed; top: 25%; left: 30%; width: 400px; border: 2px outset #ececec; background-color: #f0f0f0; color: #000; font-family: 'Tahoma', sans-serif; font-size: 12px; box-shadow: 5px 5px 10px rgba(0,0,0,0.5); z-index: 3000; will-change: top, left; }
 .fake-error-titlebar { background: linear-gradient(to right, #005cda, #0078d7, #4c9aff); color: white; padding: 3px 5px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; }
@@ -141,5 +158,4 @@ body.tilted { transition: transform 0.5s ease-in-out; transform: rotate(-2deg); 
     .clippy { transform: scale(0.7); bottom: -15px; left: -20px; }
     .clippy-bubble { font-size: 12px; }
     .duck img { width: 100px; }
-    .cookie-banner { display: none; }
 }
