@@ -41,9 +41,7 @@ async function onReset() {
     elements.resetButton.disabled = true;
     try {
         if (elements.dramaticSound) { elements.dramaticSound.currentTime = 0; elements.dramaticSound.play(); }
-        // Отправляем запрос как обычно
         await fetch(CONFIG.API_URL + '/api/reset', { method: 'POST' });
-        // Просим main.js обновить данные с сервера
         document.dispatchEvent(new CustomEvent('updateData')); 
         if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
     } catch (error) { console.error('Ошибка при сбросе таймера:', error); }
@@ -60,20 +58,18 @@ function triggerAntiCheat() {
     setTimeout(() => overlay.classList.add('show'), 10);
     document.body.classList.add('shake');
 
-    // 1. Откатываем UI немедленно
     if(elements.counter) elements.counter.textContent = `Андрей пришел вовремя: ${antiCheat.lastGoodState.count} раз`;
     state.lastResetTime = antiCheat.lastGoodState.time;
 
-    // 2. ИСПРАВЛЕНО: Отправляем команду на сервер, чтобы откатить базу данных
+    // ИСПРАВЛЕННЫЙ FETCH
     fetch(CONFIG.API_URL + '/api/force-state', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(antiCheat.lastGoodState) // Отправляем "хорошее" состояние
+        body: JSON.stringify(antiCheat.lastGoodState)
     }).catch(err => console.error("Не удалось откатить состояние на сервере:", err));
 
-    // 3. Убираем оверлей
     setTimeout(() => {
         overlay.classList.remove('show');
         document.body.classList.remove('shake');
@@ -84,6 +80,7 @@ function triggerAntiCheat() {
         }, 500);
     }, 3000);
 }
+
 
 async function onFullReset() {
     if (confirm('Вы уверены, что хотите отформатировать систему?')) {
@@ -237,9 +234,6 @@ function setupInteractiveClippy() {
 }
 
 export function initInteractivePranks(fetchDataFn) {
-    // ВАЖНО: Убедитесь, что эта функция вызывается в main.js!
-    // setFetchDataAndUpdateDisplay(fetchDataFn); - эта строка больше не нужна
-    
     if (elements.resetButton) {
         elements.resetButton.addEventListener('click', onReset);
         elements.resetButton.addEventListener('mouseover', onRunawayButtonMouseOver);
