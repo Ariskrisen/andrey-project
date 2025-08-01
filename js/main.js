@@ -16,7 +16,6 @@ async function fetchDataAndUpdateDisplay() {
         const data = await response.json();
         state.lastResetTime = new Date(data.lastResetTime).getTime();
         updateCounter(data.count);
-        // Убрали отсюда обновление сообщения, чтобы оно не конфликтовало с приколами
     } catch (error) {
         console.error('Ошибка при загрузке данных:', error);
         if(elements.counter) elements.counter.textContent = 'Ошибка загрузки данных';
@@ -83,13 +82,16 @@ function gameLoop() {
 
 function init() {
     findDOMElements();
+    // Передаем функцию в модуль, который в ней нуждается
     setFetchDataAndUpdateDisplay(fetchDataAndUpdateDisplay);
     
+    // Инициализируем все группы приколов
     initInteractivePranks();
     initOneTimePranks();
     initSecretCodes();
     initMobilePranks();
 
+    // Управление активностью вкладки
     document.addEventListener('visibilitychange', () => {
         state.isTabActive = document.visibilityState === 'visible';
         if (state.isTabActive) {
@@ -98,8 +100,10 @@ function init() {
         }
     });
 
+    // Первоначальная загрузка и запуск главного цикла
     fetchDataAndUpdateDisplay();
     setInterval(gameLoop, 1000);
 }
 
-document.addEventListener('DOMContentLoaded', init);```
+// Запускаем все, когда HTML-документ будет готов
+document.addEventListener('DOMContentLoaded', init);
