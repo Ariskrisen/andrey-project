@@ -1,59 +1,77 @@
-// Подключаем нужные библиотеки
 const express = require('express');
-const fs = require('fs');
+const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config(); // Для загрузки переменных окружения
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const dataFilePath = './data.json';
 
 app.use(cors());
 
-// Маршрут для получения данных (остается без изменений)
-app.get('/api/data', (req, res) => {
-    fs.readFile(dataFilePath, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: 'Could not read data file.' });
+// --- ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ ---
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB подключена успешно!"))
+    .catch(err => console.error("Ошибка подключения к MongoDB:", err));
+
+// --- МОДЕЛЬ ДАННЫХ ---
+// Это схема, по которой данные будут храниться в базе
+const TimerSchema = new mongoose.Schema({
+    // Уникальный идентификатор, чтобы у нас всегда была только одна запись
+    identifier: { type: String, default: 'andrey_timer', unique: true }, 
+    count: { type: Number, default: 0 },
+    lastResetTime: { type: Date, default: Date.now }
+});
+const Timer = mongoose.model('Timer', TimerSchema);
+
+// --- МАРШРУТЫ API ---
+
+// Получение данных
+app.get('/api/data', async (req, res) => {
+    try {
+        // Ищем нашу единственную запись. Если ее нет, создаем.
+        let timerData = await Timer.findOne({ identifier: 'andrey_timer' });
+        if (!timerData) {
+            timerData = new Timer();
+            await timerData.save();
         }
-        res.json(JSON.parse(data));
-    });
+        res.json(timerData);
+    } catch (error) {
+        res.status(500).json({ error: 'Ошибка сервера при получении данных' });
+    }
 });
 
-// Маршрут для увеличения счетчика (остается без изменений)
-app.post('/api/reset', (req, res) => {
-    fs.readFile(dataFilePath, 'utf8', (err, data) => {
-        if (err) { return res.status(500).json({ error: 'Could not read data file.' }); }
-        
-        const stats = JSON.parse(data);
-        stats.count++;
-        stats.lastResetTime = Date.now();
-        
-        fs.writeFile(dataFilePath, JSON.stringify(stats, null, 2), (writeErr) => {
-            if (writeErr) { return res.status(500).json({ error: 'Could not write data file.' }); }
-            res.json(stats);
-        });
-    });
+// Сброс таймера (увеличение счетчика)
+app.post('/api/reset', async (req, res) => {
+    try {
+        const updatedTimer = await Timer.findOneAndUpdate(
+            { identifier: 'andrey_timer' },
+            { 
+                $inc: { count: 1 }, // Увеличиваем count на 1
+                lastResetTime: Date.now() 
+            },
+            { new: true, upsert: true } // new: true - вернуть обновленный документ, upsert: true - создать, если не найден
+        );
+        res.json(updatedTimer);
+    } catch (error) {
+        res.status(500).json({ error: 'Ошибка сервера при сбросе' });
+    }
 });
 
-// --- НОВЫЙ МАРШРУТ для полного сброса счетчика ---
-app.post('/api/full-reset', (req, res) => {
-    fs.readFile(dataFilePath, 'utf8', (err, data) => {
-        if (err) { return res.status(500).json({ error: 'Could not read data file.' }); }
-
-        const stats = JSON.parse(data);
-        // Сбрасываем счетчик на 0 и обновляем таймер
-        stats.count = 0;
-        stats.lastResetTime = Date.now();
-
-        fs.writeFile(dataFilePath, JSON.stringify(stats, null, 2), (writeErr) => {
-            if (writeErr) { return res.status(500).json({ error: 'Could not write data file.' }); }
-            res.json(stats); // Отправляем обновленные данные
-        });
-    });
+// Полный сброс
+app.post('/api/full-reset', async (req, res) => {
+    try {
+        const resetTimer = await Timer.findOneAndUpdate(
+            { identifier: 'andrey_timer' },
+            { count: 0, lastResetTime: Date.now() },
+            { new: true, upsert: true }
+        );
+        res.json(resetTimer);
+    } catch (error) {
+        res.status(500).json({ error: 'Ошибка сервера при полном сбросе' });
+    }
 });
 
 
-// Запускаем сервер
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Сервер запущен на порту ${PORT}`);
 });
