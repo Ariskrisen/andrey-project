@@ -264,6 +264,38 @@ body.tilted { transition: transform 0.5s ease-in-out; transform: rotate(-2deg); 
 .clippy .eye.left { top: 38px; left: 32px; }
 .clippy .eye.right { top: 38px; left: 58px; }
 
+/* Уровень 3: Ярость (мертвый сайт) */
+.dead-site-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #330000; /* Темно-красный */
+    z-index: 9999;
+    display: none; /* Изначально скрыт */
+    transition: opacity 2s ease-in-out;
+}
+body.dead-site .container,
+body.dead-site .clippy,
+body.dead-site .fake-error,
+body.dead-site .update-notification,
+body.dead-site .paywall,
+body.dead-site .fake-loader {
+    display: none !important; /* Прячем все, кроме таймера */
+}
+body.dead-site #timer-wrapper {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}
+body.dead-site #timer {
+    color: #FF4136; /* Красный цвет */
+    text-shadow: 0 0 20px #FF4136;
+}
+
 /* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ --- */
 @media (max-width: 768px) {
     h1 { font-size: 1.5em; }

@@ -8,4 +8,6 @@ export const state = {
     offsetY: 0,
     tick: 0,
     isTabActive: true,
+	isPunished: false, // Флаг, что кнопка исчезла
+    isDead: false,     // Флаг, что сайт "умер"
 };

@@ -80,6 +80,24 @@ export function initSecretCodes() {
             setTimeout(() => { state.godMode = false; }, 5000);
             typedKeys = '';
         }
+		
+		// НОВЫЙ КОД для "воскрешения" сайта
+        if (typedKeys.endsWith('mercy')) {
+            if (state.isDead) {
+                hideElement(document.getElementById('deadSiteOverlay'));
+                document.body.classList.remove('dead-site');
+                state.isDead = false;
+                state.godMode = false; // Выключаем обратный отсчет
+                
+                // Возвращаем все в норму
+                if(elements.resetButton) elements.resetButton.style.display = 'inline-block';
+                state.isPunished = false;
+                rageSystem.clicks = 0;
+
+                showPrankMessage("Так-то лучше...", 2000);
+            }
+            typedKeys = '';
+        }
 
         if (e.key === konamiCode[konamiIndex]) {
             konamiIndex++;

@@ -1,98 +1,82 @@
 import { elements } from '../dom.js';
 import { state } from '../state.js';
 import { CONFIG } from '../config.js';
-import { showElement, hideElement, showPrankMessage, typeMessage } from '../utils.js';
+import { showElement, hideElement, showPrankMessage } from '../utils.js';
 
 let fetchDataAndUpdateDisplay;
 
-// --- НОВАЯ СИСТЕМА ЗАЩИТЫ "РЕПУТАЦИЯ" ---
-const reputationSystem = {
+// --- НОВАЯ СИСТЕМА "ШКАЛА ЯРОСТИ" ---
+const rageSystem = {
     clicks: 0,
     startTime: Date.now(),
-    timeframe: 60000, // 1 минута на отслеживание
+    timeframe: 60000,
     warningThreshold: 5,
     punishThreshold: 8,
-    isPunished: false
 };
 
 async function onReset() {
-    // Если пользователь уже наказан, кнопка не работает
-    if (reputationSystem.isPunished) return;
+    if (state.isPunished || state.isDead) return;
 
     const now = Date.now();
-    // Сбрасываем счетчик кликов, если прошла минута
-    if (now - reputationSystem.startTime > reputationSystem.timeframe) {
-        reputationSystem.clicks = 0;
-        reputationSystem.startTime = now;
+    if (now - rageSystem.startTime > rageSystem.timeframe) {
+        rageSystem.clicks = 0;
+        rageSystem.startTime = now;
     }
-    
-    reputationSystem.clicks++;
+    rageSystem.clicks++;
 
-    // --- Проверяем уровень угрозы ---
-    if (reputationSystem.clicks === reputationSystem.punishThreshold) {
-        // УРОВЕНЬ 3: НАКАЗАНИЕ
+    if (rageSystem.clicks >= rageSystem.punishThreshold) {
         punishUser();
         return;
     }
     
-    if (reputationSystem.clicks === reputationSystem.warningThreshold) {
-        // УРОВЕНЬ 2: ПРЕДУПРЕЖДЕНИЕ
+    if (rageSystem.clicks >= rageSystem.warningThreshold) {
         warnUser();
         return;
     }
 
-    // --- УРОВЕНЬ 1: ОБЫЧНЫЙ КЛИК С КУЛДАУНОМ ---
+    // Обычный клик
     elements.resetButton.disabled = true;
     try {
-        if (elements.dramaticSound) { elements.dramaticSound.currentTime = 0; elements.dramaticSound.play(); }
         await fetch(CONFIG.API_URL + '/api/reset', { method: 'POST' });
         document.dispatchEvent(new CustomEvent('updateData'));
         if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
-    } catch (error) { console.error('Ошибка при сбросе таймера:', error); }
-    finally {
-        // Небольшой кулдаун после каждого клика
-        setTimeout(() => {
-            elements.resetButton.disabled = false;
-        }, 2000);
+    } finally {
+        setTimeout(() => { elements.resetButton.disabled = false; }, 2000);
     }
 }
 
-function warnUser() {
+async function warnUser() {
     elements.resetButton.disabled = true;
-    // Показываем Скрепыша с угрозой
+    
+    // Обнуляем счетчик на сервере
+    try {
+        await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
+        document.dispatchEvent(new CustomEvent('updateData'));
+    } catch (error) { console.error('Не удалось обнулить счетчик:', error); }
+
     if (elements.clippy) {
         showElement(elements.clippy, false, 'flex');
         const bubble = elements.clippy.querySelector('.clippy-bubble');
-        if(bubble) bubble.textContent = "Кажется, ты пытаешься накрутить счетчик. Не советую.";
+        if(bubble) bubble.textContent = "Эй, полегче. Я слежу за тобой.";
     }
-    // Блокируем кнопку на 10 секунд
+
     setTimeout(() => {
         elements.resetButton.disabled = false;
         if(elements.clippy) hideElement(elements.clippy);
     }, 10000);
 }
 
-async function punishUser() {
-    reputationSystem.isPunished = true;
+function punishUser() {
+    state.isPunished = true;
     
     const overlay = document.createElement('div');
     overlay.className = 'anti-cheat-overlay';
-    overlay.innerHTML = '<h1>Я ЖЕ ПРЕДУПРЕЖДАЛ!</h1>';
+    overlay.innerHTML = '<h1>ТЫ МЕНЯ РАЗОЗЛИЛ!</h1>';
     document.body.appendChild(overlay);
 
     setTimeout(() => overlay.classList.add('show'), 10);
     document.body.classList.add('shake');
-
-    // Отправляем команду на полный сброс на сервер
-    try {
-        await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
-        // Обновляем данные, чтобы увидеть "0"
-        document.dispatchEvent(new CustomEvent('updateData'));
-    } catch (error) {
-        console.error('Не удалось обнулить счетчик:', error);
-    }
-
-    // Кнопка исчезает
+    
     if(elements.resetButton) elements.resetButton.style.display = 'none';
 
     setTimeout(() => {
@@ -102,19 +86,53 @@ async function punishUser() {
     }, 4000);
 }
 
+// Перехватываем клик на "Форматировать систему"
 async function onFullReset() {
+    if (state.isPunished) {
+        // УРОВЕНЬ 3: ЯРОСТЬ
+        triggerRage();
+        return;
+    }
+
     if (confirm('Вы уверены, что хотите отформатировать систему?')) {
+        // Обычное поведение
         elements.fullResetButton.disabled = true;
         document.body.classList.add('shake');
         try {
             await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
-            // Отправляем событие для обновления данных
             document.dispatchEvent(new CustomEvent('updateData'));
+            // Возвращаем кнопку, если она была скрыта
+            if(elements.resetButton) elements.resetButton.style.display = 'inline-block';
+            state.isPunished = false;
+            rageSystem.clicks = 0;
+        } finally {
+            setTimeout(() => { document.body.classList.remove('shake'); elements.fullResetButton.disabled = false; }, 820);
         }
-        catch (error) { console.error('Ошибка при полном сбросе:', error); }
-        finally { setTimeout(() => { document.body.classList.remove('shake'); elements.fullResetButton.disabled = false; }, 820); }
     }
 }
+
+function triggerRage() {
+    if (elements.bsod) {
+        showElement(elements.bsod);
+        const progress = document.getElementById('bsodProgress');
+        let percent = 0;
+        const interval = setInterval(() => {
+            if (percent >= 100) {
+                clearInterval(interval);
+                // После BSOD сайт "умирает"
+                hideElement(elements.bsod);
+                showElement(document.getElementById('deadSiteOverlay'));
+                document.body.classList.add('dead-site');
+                state.isDead = true;
+                state.godMode = true; // Включаем обратный отсчет
+            } else {
+                percent++;
+                if(progress) progress.textContent = percent;
+            }
+        }, 50);
+    }
+}
+
 
 function onRunawayButtonMouseOver(e) {
     if (Math.random() > 0.75) {
