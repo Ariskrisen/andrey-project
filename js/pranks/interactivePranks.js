@@ -1,86 +1,106 @@
 import { elements } from '../dom.js';
 import { state } from '../state.js';
 import { CONFIG } from '../config.js';
-import { showElement, hideElement, showPrankMessage } from '../utils.js';
+import { showElement, hideElement, showPrankMessage, typeMessage } from '../utils.js';
 
 let fetchDataAndUpdateDisplay;
 
-export function setFetchDataAndUpdateDisplay(fn) {
-    fetchDataAndUpdateDisplay = fn;
-}
-
-// --- Прикол №1: Анти-накрутка (ИСПРАВЛЕННАЯ ВЕРСИЯ) ---
-const antiCheat = {
+// --- НОВАЯ СИСТЕМА ЗАЩИТЫ "РЕПУТАЦИЯ" ---
+const reputationSystem = {
     clicks: 0,
-    time: Date.now(),
-    limit: 5,
-    duration: 10000,
-    isActive: false,
-    lastGoodState: { count: 0, time: 0 }
+    startTime: Date.now(),
+    timeframe: 60000, // 1 минута на отслеживание
+    warningThreshold: 5,
+    punishThreshold: 8,
+    isPunished: false
 };
 
 async function onReset() {
-    if (antiCheat.isActive) return;
+    // Если пользователь уже наказан, кнопка не работает
+    if (reputationSystem.isPunished) return;
 
     const now = Date.now();
-    if (now - antiCheat.time > antiCheat.duration) {
-        antiCheat.clicks = 0;
-        antiCheat.time = now;
-        const countText = elements.counter ? elements.counter.textContent.split(': ')[1] : '0';
-        antiCheat.lastGoodState.count = parseInt(countText, 10) || 0;
-        antiCheat.lastGoodState.time = state.lastResetTime;
+    // Сбрасываем счетчик кликов, если прошла минута
+    if (now - reputationSystem.startTime > reputationSystem.timeframe) {
+        reputationSystem.clicks = 0;
+        reputationSystem.startTime = now;
     }
     
-    antiCheat.clicks++;
+    reputationSystem.clicks++;
 
-    if (antiCheat.clicks >= antiCheat.limit) {
-        triggerAntiCheat();
+    // --- Проверяем уровень угрозы ---
+    if (reputationSystem.clicks === reputationSystem.punishThreshold) {
+        // УРОВЕНЬ 3: НАКАЗАНИЕ
+        punishUser();
+        return;
+    }
+    
+    if (reputationSystem.clicks === reputationSystem.warningThreshold) {
+        // УРОВЕНЬ 2: ПРЕДУПРЕЖДЕНИЕ
+        warnUser();
         return;
     }
 
+    // --- УРОВЕНЬ 1: ОБЫЧНЫЙ КЛИК С КУЛДАУНОМ ---
     elements.resetButton.disabled = true;
     try {
         if (elements.dramaticSound) { elements.dramaticSound.currentTime = 0; elements.dramaticSound.play(); }
         await fetch(CONFIG.API_URL + '/api/reset', { method: 'POST' });
-        document.dispatchEvent(new CustomEvent('updateData')); 
+        document.dispatchEvent(new CustomEvent('updateData'));
         if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
     } catch (error) { console.error('Ошибка при сбросе таймера:', error); }
-    finally { elements.resetButton.disabled = false; }
+    finally {
+        // Небольшой кулдаун после каждого клика
+        setTimeout(() => {
+            elements.resetButton.disabled = false;
+        }, 2000);
+    }
 }
 
-function triggerAntiCheat() {
-    antiCheat.isActive = true;
+function warnUser() {
+    elements.resetButton.disabled = true;
+    // Показываем Скрепыша с угрозой
+    if (elements.clippy) {
+        showElement(elements.clippy, false, 'flex');
+        const bubble = elements.clippy.querySelector('.clippy-bubble');
+        if(bubble) bubble.textContent = "Кажется, ты пытаешься накрутить счетчик. Не советую.";
+    }
+    // Блокируем кнопку на 10 секунд
+    setTimeout(() => {
+        elements.resetButton.disabled = false;
+        if(elements.clippy) hideElement(elements.clippy);
+    }, 10000);
+}
+
+async function punishUser() {
+    reputationSystem.isPunished = true;
+    
     const overlay = document.createElement('div');
     overlay.className = 'anti-cheat-overlay';
-    overlay.innerHTML = '<h1>ХВАТИТ НАКРУЧИВАТЬ!</h1>';
+    overlay.innerHTML = '<h1>Я ЖЕ ПРЕДУПРЕЖДАЛ!</h1>';
     document.body.appendChild(overlay);
 
     setTimeout(() => overlay.classList.add('show'), 10);
     document.body.classList.add('shake');
 
-    if(elements.counter) elements.counter.textContent = `Андрей пришел вовремя: ${antiCheat.lastGoodState.count} раз`;
-    state.lastResetTime = antiCheat.lastGoodState.time;
+    // Отправляем команду на полный сброс на сервер
+    try {
+        await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
+        // Обновляем данные, чтобы увидеть "0"
+        document.dispatchEvent(new CustomEvent('updateData'));
+    } catch (error) {
+        console.error('Не удалось обнулить счетчик:', error);
+    }
 
-    // ИСПРАВЛЕННЫЙ FETCH
-    fetch(CONFIG.API_URL + '/api/force-state', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(antiCheat.lastGoodState)
-    }).catch(err => console.error("Не удалось откатить состояние на сервере:", err));
+    // Кнопка исчезает
+    if(elements.resetButton) elements.resetButton.style.display = 'none';
 
     setTimeout(() => {
         overlay.classList.remove('show');
         document.body.classList.remove('shake');
-        setTimeout(() => {
-            overlay.remove();
-            antiCheat.clicks = 0;
-            antiCheat.isActive = false;
-        }, 500);
-    }, 3000);
+        setTimeout(() => overlay.remove(), 500);
+    }, 4000);
 }
-
 
 async function onFullReset() {
     if (confirm('Вы уверены, что хотите отформатировать систему?')) {

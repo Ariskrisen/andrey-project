@@ -37,7 +37,12 @@ function setupUpdateNotification() {
 
 function setupClippy() {
     if(elements.clippy) {
-        setTimeout(() => showElement(elements.clippy, false, 'flex'), CONFIG.CLIPPY_DELAY);
+        setTimeout(() => {
+            // Показываем Скрепыша, только если он еще не был показан (например, системой защиты)
+            if (getComputedStyle(elements.clippy).display === 'none') {
+                showElement(elements.clippy, false, 'flex');
+            }
+        }, CONFIG.CLIPPY_DELAY);
         if(elements.closeClippyBtn) elements.closeClippyBtn.addEventListener('click', () => hideElement(elements.clippy));
     }
 }
