@@ -48,3 +48,20 @@ export function showPrankMessage(message, duration = 4000) {
         state.isPrankMessageActive = false;
     }, duration);
 }
+
+// НОВАЯ УЛУЧШЕННАЯ ФУНКЦИЯ для Скрепыша
+export function showClippyWithMessage(message, duration = null) {
+    if (!elements.clippy) return;
+    
+    const bubble = elements.clippy.querySelector('.clippy-bubble');
+    if (bubble) bubble.textContent = message;
+    
+    showElement(elements.clippy, false, 'flex');
+    
+    // Если указана длительность, Скрепыш сам исчезнет
+    if (duration) {
+        setTimeout(() => {
+            hideElement(elements.clippy);
+        }, duration);
+    }
+}

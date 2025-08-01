@@ -1,6 +1,6 @@
 import { CONFIG } from '../config.js';
 import { elements } from '../dom.js';
-import { showElement, hideElement, randomDelay, showPrankMessage } from '../utils.js';
+import { showElement, hideElement, randomDelay, showPrankMessage, showClippyWithMessage } from '../utils.js';
 
 function setupCookieBanner() {
     if (!localStorage.getItem('cookies_accepted')) {
@@ -37,12 +37,14 @@ function setupUpdateNotification() {
 
 function setupClippy() {
     if(elements.clippy) {
+        // Теперь просто вызываем Скрепыша по таймеру
         setTimeout(() => {
-            // Показываем Скрепыша, только если он еще не был показан (например, системой защиты)
+            // Убеждаемся, что не показываем его, если он уже чем-то занят
             if (getComputedStyle(elements.clippy).display === 'none') {
-                showElement(elements.clippy, false, 'flex');
+                 showClippyWithMessage("Похоже, вы ждете Андрея. Хотите совет? Терпение. Больше у меня ничего нет.");
             }
         }, CONFIG.CLIPPY_DELAY);
+        
         if(elements.closeClippyBtn) elements.closeClippyBtn.addEventListener('click', () => hideElement(elements.clippy));
     }
 }

@@ -1,11 +1,11 @@
 import { elements } from '../dom.js';
 import { state } from '../state.js';
 import { CONFIG } from '../config.js';
-import { showElement, hideElement, showPrankMessage } from '../utils.js';
+import { showElement, hideElement, showPrankMessage, showClippyWithMessage } from '../utils.js';
 
 let fetchDataAndUpdateDisplay;
 
-// --- НОВАЯ, ИСПРАВЛЕННАЯ СИСТЕМА "ШКАЛА ЯРОСТИ" ---
+// --- НОВАЯ, ЦЕНТРАЛИЗОВАННАЯ СИСТЕМА "ШКАЛА ЯРОСТИ" ---
 const rageSystem = {
     clicks: 0,
     startTime: Date.now(),
@@ -14,33 +14,29 @@ const rageSystem = {
     punishThreshold: 8,
 };
 
-async function onReset() {
-    // Если кнопка уже исчезла или сайт "мертв", ничего не делаем
+// Главный обработчик клика на кнопку
+async function handleResetClick() {
     if (state.isPunished || state.isDead) return;
 
     const now = Date.now();
-    // Сбрасываем счетчик кликов, если прошла минута
     if (now - rageSystem.startTime > rageSystem.timeframe) {
         rageSystem.clicks = 0;
         rageSystem.startTime = now;
     }
-    
     rageSystem.clicks++;
 
-    // --- Проверяем уровень угрозы ---
+    // Используем четкую логику if/else if
     if (rageSystem.clicks >= rageSystem.punishThreshold) {
-        // УРОВЕНЬ 2: ГНЕВ
-        punishUser();
-        return;
+        await punishUser(); // Уровень 2: Гнев
+    } else if (rageSystem.clicks >= rageSystem.warningThreshold) {
+        await warnUser(); // Уровень 1: Раздражение
+    } else {
+        await performNormalClick(); // Уровень 0: Спокойствие
     }
-    
-    if (rageSystem.clicks >= rageSystem.warningThreshold) {
-        // УРОВЕНЬ 1: РАЗДРАЖЕНИЕ (ПРЕДУПРЕЖДЕНИЕ)
-        warnUser();
-        return;
-    }
+}
 
-    // --- УРОВЕНЬ 0: ОБЫЧНЫЙ КЛИК С КУЛДАУНОМ ---
+// Действие для обычного клика
+async function performNormalClick() {
     elements.resetButton.disabled = true;
     try {
         if (elements.dramaticSound) { elements.dramaticSound.currentTime = 0; elements.dramaticSound.play(); }
@@ -48,37 +44,27 @@ async function onReset() {
         document.dispatchEvent(new CustomEvent('updateData'));
         if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
     } finally {
-        setTimeout(() => {
-            elements.resetButton.disabled = false;
-        }, 2000);
+        setTimeout(() => { elements.resetButton.disabled = false; }, 2000);
     }
 }
 
+// Действие для предупреждения
 async function warnUser() {
     elements.resetButton.disabled = true;
-    
-    // 1. Обнуляем счетчик на сервере
     try {
         await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
-        document.dispatchEvent(new CustomEvent('updateData')); // Обновляем UI, чтобы показать "0"
+        document.dispatchEvent(new CustomEvent('updateData'));
     } catch (error) { console.error('Не удалось обнулить счетчик:', error); }
+    
+    showClippyWithMessage("Эй, полегче. Я слежу за тобой.", 10000);
 
-    // 2. Показываем Скрепыша с угрозой
-    if (elements.clippy) {
-        showElement(elements.clippy, false, 'flex');
-        const bubble = elements.clippy.querySelector('.clippy-bubble');
-        if(bubble) bubble.textContent = "Эй, полегче. Я слежу за тобой.";
-    }
-
-    // 3. Блокируем кнопку на 10 секунд
     setTimeout(() => {
         elements.resetButton.disabled = false;
-        if(elements.clippy) hideElement(elements.clippy);
     }, 10000);
 }
 
-function punishUser() {
-    // Ставим флаг, что пользователь наказан
+// Действие для наказания
+async function punishUser() {
     state.isPunished = true;
     
     const overlay = document.createElement('div');
@@ -89,7 +75,6 @@ function punishUser() {
     setTimeout(() => overlay.classList.add('show'), 10);
     document.body.classList.add('shake');
     
-    // Кнопка исчезает
     if(elements.resetButton) elements.resetButton.style.display = 'none';
 
     setTimeout(() => {
@@ -99,22 +84,21 @@ function punishUser() {
     }, 4000);
 }
 
+// Обработчик для кнопки "Форматировать систему"
 async function onFullReset() {
-    // ИСПРАВЛЕНО: Проверяем флаг, а не существование кнопки
     if (state.isPunished && !state.isDead) {
         // УРОВЕНЬ 3: ЯРОСТЬ
         triggerRage();
         return;
     }
 
-    // Обычное поведение (если пользователь не наказан)
     if (confirm('Вы уверены, что хотите отформатировать систему?')) {
         elements.fullResetButton.disabled = true;
         document.body.classList.add('shake');
         try {
             await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
             document.dispatchEvent(new CustomEvent('updateData'));
-            // Сбрасываем все флаги и возвращаем кнопку
+            // СБРАСЫВАЕМ ВСЕ СОСТОЯНИЯ ЯРОСТИ
             if(elements.resetButton) elements.resetButton.style.display = 'inline-block';
             state.isPunished = false;
             rageSystem.clicks = 0;
@@ -136,7 +120,7 @@ function triggerRage() {
                 showElement(document.getElementById('deadSiteOverlay'));
                 document.body.classList.add('dead-site');
                 state.isDead = true;
-                state.godMode = true; // Включаем обратный отсчет
+                state.godMode = true;
             } else {
                 percent++;
                 if(progress) progress.textContent = percent;
@@ -282,10 +266,10 @@ function setupInteractiveClippy() {
 }
 
 export function initInteractivePranks(fetchDataFn) {
-    fetchDataAndUpdateDisplay = fetchDataFn;
+    fetchDataAndUpdateDisplay = fetchDataFn; // Это больше не используется, но оставим для совместимости
     
     if (elements.resetButton) {
-        elements.resetButton.addEventListener('click', onReset);
+        elements.resetButton.addEventListener('click', handleResetClick); // <-- Главное изменение
         elements.resetButton.addEventListener('mouseover', onRunawayButtonMouseOver);
         elements.resetButton.addEventListener('mouseleave', onRunawayButtonMouseLeave);
     }
