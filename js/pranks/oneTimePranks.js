@@ -57,7 +57,13 @@ function setupFakeLoader() {
             const interval = setInterval(() => {
                 if (width >= 99) {
                     clearInterval(interval);
-                    if(elements.fakeLoader) elements.fakeLoader.querySelector('p').textContent = 'Загрузка терпения... Ошибка.';
+                    if(elements.fakeLoader) {
+                        elements.fakeLoader.querySelector('p').textContent = 'Загрузка терпения... Ошибка.';
+                        // ИСПРАВЛЕНО: Скрываем окно через 3 секунды после ошибки
+                        setTimeout(() => {
+                            hideElement(elements.fakeLoader);
+                        }, 3000);
+                    }
                 } else {
                     width++;
                     if(elements.loaderProgress) elements.loaderProgress.style.width = width + '%';

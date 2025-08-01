@@ -1,8 +1,8 @@
-/* --- ОСНОВНЫЕ СТИЛИ (Ретро-терминал) --- */
+/* --- ОСНОВНЫЕ СТИЛИ (Новый шрифт) --- */
 body {
     background-color: #000;
     color: #00FF41;
-    font-family: 'VT323', monospace;
+    font-family: 'Roboto Mono', monospace;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,7 +23,8 @@ h1, #timer, button {
     text-shadow: 0 0 8px #00FF41;
 }
 h1 {
-    font-size: 3em;
+    font-size: 2.5em;
+    font-weight: 700;
 }
 #timer-wrapper {
     display: flex;
@@ -37,19 +38,15 @@ h1 {
     cursor: pointer;
 }
 .cursor {
-    font-size: 4em;
-    animation: blink 1s step-end infinite;
-}
-@keyframes blink {
-    50% { color: transparent; }
+    display: none; /* Убираем, т.к. он не сочетается с новым шрифтом */
 }
 button {
     background: transparent;
     border: 1px solid #00FF41;
     color: #00FF41;
     padding: 15px 32px;
-    font-size: 1.5em;
-    font-family: 'VT323', monospace;
+    font-size: 1.2em;
+    font-family: 'Roboto Mono', monospace;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
     margin: 10px;
@@ -71,7 +68,7 @@ button:hover {
 
 /* Общие стили и анимации */
 #statusMessage { margin-top: 15px; font-size: 1.2em; min-height: 20px; color: #FFC300; }
-#statusMessage::after { content: '_'; animation: blink 1s step-end infinite; }
+#statusMessage::after { content: ''; } /* Убираем курсор */
 @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 .shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; will-change: transform; }
 body { cursor: wait; }
@@ -90,15 +87,16 @@ body.chaos img, body.chaos canvas, body.chaos .particle { filter: invert(1); }
 .custom-context-menu li { padding: 8px 15px; cursor: not-allowed; }
 .custom-context-menu li:hover { background-color: #0078d7; color: white; }
 
-/* Плавающие окна и баннеры */
-.cookie-banner { position: fixed; bottom: -120px; left: 0; width: 100%; background-color: #1a1a1a; border-top: 2px solid #333; padding: 15px; text-align: center; z-index: 1000; transition: bottom 0.5s ease-in-out; will-change: bottom; }
+/* Плавающие окна и баннеры (с исправлениями) */
+.cookie-banner { position: fixed; bottom: -150px; left: 0; width: 100%; background-color: #1a1a1a; border-top: 2px solid #333; padding: 15px; box-sizing: border-box; text-align: center; z-index: 1000; transition: bottom 0.5s ease-in-out; will-change: bottom; }
 .cookie-banner.show { bottom: 0; }
+.cookie-banner p { margin: 0 0 10px 0; font-size: 1em; }
 .fake-error { display: none; position: fixed; top: 25%; left: 30%; width: 400px; border: 2px outset #ececec; background-color: #f0f0f0; color: #000; font-family: 'Tahoma', sans-serif; font-size: 12px; box-shadow: 5px 5px 10px rgba(0,0,0,0.5); z-index: 3000; will-change: top, left; }
 .fake-error-titlebar { background: linear-gradient(to right, #005cda, #0078d7, #4c9aff); color: white; padding: 3px 5px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; }
-.fake-error-titlebar .close-btn { background-color: #d84a2c; border: 1px outset white; color: white; font-weight: bold; width: 18px; height: 18px; padding: 0; line-height: 1; font-size: 14px; font-family: 'Tahoma', sans-serif; }
-.fake-error-content { padding: 20px; display: flex; align-items: center; position: relative; min-height: 60px; }
+.fake-error-titlebar .close-btn { background-color: #d84a2c; border: 1px outset white; color: white; font-weight: bold; width: 20px; height: 20px; padding: 0; line-height: 20px; text-align: center; font-size: 14px; font-family: 'Tahoma', sans-serif; }
+.fake-error-content { padding: 20px; padding-bottom: 40px; display: flex; align-items: center; position: relative; min-height: 60px; }
 .fake-error-content img { width: 32px; height: 32px; margin-right: 15px; }
-.fake-error-content .ok-btn { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); padding: 5px 25px; border: 1px solid #999; background-color: #f0f0f0; }
+.fake-error-content .ok-btn { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); padding: 2px 25px; border: 1px outset #999; background-color: #f0f0f0; }
 .update-notification { position: fixed; bottom: 20px; right: 20px; width: 350px; background-color: #333; border: 1px solid #555; padding: 15px; box-shadow: 0 0 20px black; z-index: 1001; transform: translateX(150%); transition: transform 0.7s ease-in-out; will-change: transform; }
 .update-notification.show { transform: translateX(0); }
 .update-notification button { font-size: 0.9em; padding: 5px 10px; }
@@ -115,7 +113,7 @@ input:checked + .slider:before { transform: translateX(26px); }
 .clippy img { width: 100px; }
 .clippy-bubble { background: #FFFFCC; border: 1px solid black; padding: 15px; border-radius: 10px; margin-left: -20px; margin-bottom: 50px; color: black; font-family: 'Comic Sans MS', sans-serif; font-size: 14px; position: relative; }
 .clippy-bubble::after { content: ''; position: absolute; bottom: -10px; left: 30px; width: 20px; height: 20px; background: #FFFFCC; border-bottom: 1px solid black; border-right: 1px solid black; transform: rotate(45deg); }
-.clippy .close-btn { position: absolute; top: 5px; right: 5px; background: transparent; border: none; font-size: 16px; color: black; cursor: pointer; padding: 0; line-height: 1; font-family: 'Tahoma', sans-serif; }
+.clippy .close-btn { position: absolute; top: 5px; right: 5px; background: transparent; border: none; font-size: 16px; color: black; cursor: pointer; padding: 0; line-height: 1; width: 20px; height: 20px; text-align: center; font-family: 'Tahoma', sans-serif; }
 .paywall { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #222; border: 2px solid #555; padding: 25px; z-index: 4000; text-align: center; box-shadow: 0 0 30px black; color: #fff; font-family: sans-serif; }
 .paywall h3 { color: #f00; margin-top: 0; }
 .fake-loader { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 400px; background: #111; padding: 10px; border: 1px solid #444; z-index: 5000; text-align: left; }
@@ -129,15 +127,14 @@ body.tilted { transition: transform 0.5s ease-in-out; transform: rotate(-2deg); 
 #shatterContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 5000; }
 .particle { position: absolute; background-color: #00FF41; }
 
-/* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ( breakpoints < 768px) --- */
+/* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ --- */
 @media (max-width: 768px) {
-    h1 { font-size: 1.8em; }
-    #timer { font-size: 13vw; letter-spacing: 0; }
-    .cursor { display: none; }
-    button { font-size: 1em; padding: 12px 18px; }
+    h1 { font-size: 1.5em; }
+    #timer { font-size: 12vw; }
+    button { font-size: 0.9em; padding: 10px 15px; }
     .container { padding: 10px; }
     .fake-error, .update-notification, .fake-loader, .paywall { width: 90vw; left: 50%; transform: translateX(-50%); margin-left: 0; }
-    .fake-error { top: 15%; }
+    .fake-error { top: 15%; font-size: 11px; }
     .paywall { top: 30%; }
     .update-notification { right: 5vw; bottom: 20px; left: auto; transform: translateX(150%); width: 85vw; }
     .update-notification.show { transform: translateX(0); }

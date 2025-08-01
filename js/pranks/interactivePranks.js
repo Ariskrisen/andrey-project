@@ -3,7 +3,6 @@ import { state } from '../state.js';
 import { CONFIG } from '../config.js';
 import { showElement, hideElement } from '../utils.js';
 
-// Эта переменная будет заполнена функцией из main.js
 let fetchDataAndUpdateDisplay;
 
 export function setFetchDataAndUpdateDisplay(fn) {
@@ -54,28 +53,42 @@ function onRunawayButtonMouseLeave(e) {
     button.style.left = '';
 }
 
+let isShattering = false;
 function shatterTimer(element) {
-    if (!element || typeof html2canvas !== 'function' || typeof anime !== 'function' || element.style.opacity === '0') return;
+    if (isShattering || !element || typeof html2canvas !== 'function' || typeof anime !== 'function' || element.style.opacity === '0') return;
+    isShattering = true;
     html2canvas(element, { backgroundColor: null }).then(canvas => {
         element.style.opacity = '0';
         const ctx = canvas.getContext('2d');
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        const particleSize = 4;
+        
+        // ИСПРАВЛЕНО: Уменьшаем количество частиц для производительности
+        const particleSize = 8;
+        
         for (let y = 0; y < canvas.height; y += particleSize) {
             for (let x = 0; x < canvas.width; x += particleSize) {
                 if (imageData[(y * canvas.width + x) * 4 + 3] > 128) {
                     const particle = document.createElement('div');
                     particle.className = 'particle';
-                    particle.style.width = `${particleSize}px`; particle.style.height = `${particleSize}px`;
+                    particle.style.width = `${particleSize}px`;
+                    particle.style.height = `${particleSize}px`;
                     const rect = element.getBoundingClientRect();
-                    particle.style.top = `${rect.top + y}px`; particle.style.left = `${rect.left + x}px`;
+                    particle.style.top = `${rect.top + y}px`;
+                    particle.style.left = `${rect.left + x}px`;
                     elements.shatterContainer.appendChild(particle);
-                    anime({ targets: particle, translateX: (Math.random() - 0.5) * 30, translateY: [0, window.innerHeight - rect.top - y], opacity: [1, 0], duration: Math.random() * 1500 + 1000, easing: 'easeInQuad',
-                        complete: () => particle.remove() });
+                    anime({
+                        targets: particle,
+                        translateX: (Math.random() - 0.5) * 30,
+                        translateY: [0, window.innerHeight - rect.top - y],
+                        opacity: [1, 0],
+                        duration: Math.random() * 1500 + 1000,
+                        easing: 'easeInQuad',
+                        complete: () => particle.remove()
+                    });
                 }
             }
         }
-        setTimeout(() => element.style.opacity = '1', 2500);
+        setTimeout(() => { element.style.opacity = '1'; isShattering = false; }, 2500);
     });
 }
 
@@ -101,7 +114,9 @@ function setupDragAndDrop() {
     }
 }
 
-export function initInteractivePranks() {
+export function initInteractivePranks(fetchDataFn) {
+    fetchDataAndUpdateDisplay = fetchDataFn;
+    
     if (elements.resetButton) {
         elements.resetButton.addEventListener('click', onReset);
         elements.resetButton.addEventListener('mouseover', onRunawayButtonMouseOver);
