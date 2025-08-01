@@ -3,7 +3,13 @@ import { state } from '../state.js';
 import { CONFIG } from '../config.js';
 import { showElement, hideElement, showPrankMessage } from '../utils.js';
 
-// --- Прикол №1: Анти-накрутка ---
+let fetchDataAndUpdateDisplay;
+
+export function setFetchDataAndUpdateDisplay(fn) {
+    fetchDataAndUpdateDisplay = fn;
+}
+
+// --- Прикол №1: Анти-накрутка (ИСПРАВЛЕННАЯ ВЕРСИЯ) ---
 const antiCheat = {
     clicks: 0,
     time: Date.now(),
@@ -35,9 +41,10 @@ async function onReset() {
     elements.resetButton.disabled = true;
     try {
         if (elements.dramaticSound) { elements.dramaticSound.currentTime = 0; elements.dramaticSound.play(); }
+        // Отправляем запрос как обычно
         await fetch(CONFIG.API_URL + '/api/reset', { method: 'POST' });
-        // Отправляем событие, чтобы main.js обновил данные
-        document.dispatchEvent(new CustomEvent('updateData'));
+        // Просим main.js обновить данные с сервера
+        document.dispatchEvent(new CustomEvent('updateData')); 
         if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
     } catch (error) { console.error('Ошибка при сбросе таймера:', error); }
     finally { elements.resetButton.disabled = false; }
@@ -53,10 +60,20 @@ function triggerAntiCheat() {
     setTimeout(() => overlay.classList.add('show'), 10);
     document.body.classList.add('shake');
 
-    // Откатываем счетчик локально и обновляем таймер
+    // 1. Откатываем UI немедленно
     if(elements.counter) elements.counter.textContent = `Андрей пришел вовремя: ${antiCheat.lastGoodState.count} раз`;
     state.lastResetTime = antiCheat.lastGoodState.time;
 
+    // 2. ИСПРАВЛЕНО: Отправляем команду на сервер, чтобы откатить базу данных
+    fetch(CONFIG.API_URL + '/api/force-state', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(antiCheat.lastGoodState) // Отправляем "хорошее" состояние
+    }).catch(err => console.error("Не удалось откатить состояние на сервере:", err));
+
+    // 3. Убираем оверлей
     setTimeout(() => {
         overlay.classList.remove('show');
         document.body.classList.remove('shake');
@@ -219,7 +236,10 @@ function setupInteractiveClippy() {
     });
 }
 
-export function initInteractivePranks() {
+export function initInteractivePranks(fetchDataFn) {
+    // ВАЖНО: Убедитесь, что эта функция вызывается в main.js!
+    // setFetchDataAndUpdateDisplay(fetchDataFn); - эта строка больше не нужна
+    
     if (elements.resetButton) {
         elements.resetButton.addEventListener('click', onReset);
         elements.resetButton.addEventListener('mouseover', onRunawayButtonMouseOver);
