@@ -2,10 +2,9 @@ import { CONFIG } from './config.js';
 import { elements, findDOMElements } from './dom.js';
 import { state } from './state.js';
 import { typeMessage } from './utils.js';
-
 import { initOneTimePranks } from './pranks/oneTimePranks.js';
 import { runPeriodicPranks } from './pranks/periodicPranks.js';
-import { initInteractivePranks, setFetchDataAndUpdateDisplay } from './pranks/interactivePranks.js';
+import { initInteractivePranks } from './pranks/interactivePranks.js';
 import { initSecretCodes } from './pranks/secretCodes.js';
 import { initMobilePranks } from './pranks/mobilePranks.js';
 
@@ -82,16 +81,15 @@ function gameLoop() {
 
 function init() {
     findDOMElements();
-    // Передаем функцию в модуль, который в ней нуждается
-    setFetchDataAndUpdateDisplay(fetchDataAndUpdateDisplay);
     
-    // Инициализируем все группы приколов
     initInteractivePranks();
     initOneTimePranks();
     initSecretCodes();
     initMobilePranks();
 
-    // Управление активностью вкладки
+    // Слушаем пользовательское событие для обновления данных
+    document.addEventListener('updateData', fetchDataAndUpdateDisplay);
+
     document.addEventListener('visibilitychange', () => {
         state.isTabActive = document.visibilityState === 'visible';
         if (state.isTabActive) {
@@ -100,10 +98,8 @@ function init() {
         }
     });
 
-    // Первоначальная загрузка и запуск главного цикла
     fetchDataAndUpdateDisplay();
     setInterval(gameLoop, 1000);
 }
 
-// Запускаем все, когда HTML-документ будет готов
 document.addEventListener('DOMContentLoaded', init);

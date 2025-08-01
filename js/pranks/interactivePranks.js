@@ -3,18 +3,12 @@ import { state } from '../state.js';
 import { CONFIG } from '../config.js';
 import { showElement, hideElement, showPrankMessage } from '../utils.js';
 
-let fetchDataAndUpdateDisplay;
-
-export function setFetchDataAndUpdateDisplay(fn) {
-    fetchDataAndUpdateDisplay = fn;
-}
-
 // --- Прикол №1: Анти-накрутка ---
 const antiCheat = {
     clicks: 0,
     time: Date.now(),
     limit: 5,
-    duration: 10000, // 10 секунд
+    duration: 10000,
     isActive: false,
     lastGoodState: { count: 0, time: 0 }
 };
@@ -42,7 +36,8 @@ async function onReset() {
     try {
         if (elements.dramaticSound) { elements.dramaticSound.currentTime = 0; elements.dramaticSound.play(); }
         await fetch(CONFIG.API_URL + '/api/reset', { method: 'POST' });
-        await fetchDataAndUpdateDisplay();
+        // Отправляем событие, чтобы main.js обновил данные
+        document.dispatchEvent(new CustomEvent('updateData'));
         if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
     } catch (error) { console.error('Ошибка при сбросе таймера:', error); }
     finally { elements.resetButton.disabled = false; }
@@ -58,6 +53,7 @@ function triggerAntiCheat() {
     setTimeout(() => overlay.classList.add('show'), 10);
     document.body.classList.add('shake');
 
+    // Откатываем счетчик локально и обновляем таймер
     if(elements.counter) elements.counter.textContent = `Андрей пришел вовремя: ${antiCheat.lastGoodState.count} раз`;
     state.lastResetTime = antiCheat.lastGoodState.time;
 
@@ -78,7 +74,8 @@ async function onFullReset() {
         document.body.classList.add('shake');
         try {
             await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
-            await fetchDataAndUpdateDisplay();
+            // Отправляем событие для обновления данных
+            document.dispatchEvent(new CustomEvent('updateData'));
         }
         catch (error) { console.error('Ошибка при полном сбросе:', error); }
         finally { setTimeout(() => { document.body.classList.remove('shake'); elements.fullResetButton.disabled = false; }, 820); }
@@ -162,7 +159,7 @@ function setupVirusCursor() {
             elements.virusCursor.style.display = 'block';
         }
         elements.virusCursor.style.transform = `translate(${e.clientX + 10}px, ${e.clientY + 10}px)`;
-    }, { once: true }); // Запускаем только один раз, чтобы не вешать лишний обработчик
+    }, { once: true });
 }
 
 function setupScrollResistance() {
@@ -222,9 +219,7 @@ function setupInteractiveClippy() {
     });
 }
 
-export function initInteractivePranks(fetchDataFn) {
-    fetchDataAndUpdateDisplay = fetchDataFn;
-    
+export function initInteractivePranks() {
     if (elements.resetButton) {
         elements.resetButton.addEventListener('click', onReset);
         elements.resetButton.addEventListener('mouseover', onRunawayButtonMouseOver);
