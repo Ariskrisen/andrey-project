@@ -73,7 +73,7 @@ app.post('/api/force-state', async (req, res) => {
         const { count, lastResetTime } = req.body; // Получаем "правильное" состояние из тела запроса
         
         // Проверяем, что нам прислали корректные данные
-        if (typeof count !== 'number' || typeof lastResetTime !== 'number') {
+        if (typeof count !== 'number' || lastResetTime === undefined) {
             return res.status(400).json({ error: 'Неверный формат данных' });
         }
 
