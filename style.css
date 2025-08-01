@@ -143,6 +143,41 @@ body.tilted { transition: transform 0.5s ease-in-out; transform: rotate(-2deg); 
 @keyframes rock { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
 #shatterContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 5000; }
 .particle { position: absolute; background-color: #00FF41; }
+.virus-cursor {
+    position: fixed;
+    display: none; /* Изначально скрыт */
+    width: 32px;
+    height: 32px;
+    z-index: 9999;
+    pointer-events: none; /* ВАЖНО: чтобы он не мешал кликать на другие элементы */
+    transition: transform 0.1s ease-out; /* Плавное следование */
+}
+.virus-cursor img {
+    width: 100%;
+    filter: drop-shadow(0 0 5px red); /* Красное свечение */
+}
+
+/* Прикол №3: Глючный текст */
+@keyframes text-glitch-anim {
+    0% { opacity: 1; }
+    25% { opacity: 0.8; text-shadow: 2px 2px #FF00FF; }
+    50% { opacity: 1; text-shadow: -2px -2px #00FFFF; }
+    75% { opacity: 0.7; text-shadow: 2px -2px #FF00FF; }
+    100% { opacity: 1; text-shadow: 0 0 8px #00FF41; }
+}
+.text-glitch {
+    animation: text-glitch-anim 0.3s linear;
+}
+
+/* Прикол №4: Хакерский ввод */
+.hacker-key {
+    position: fixed;
+    color: #00FF41;
+    font-size: 1.5em;
+    pointer-events: none;
+    text-shadow: 0 0 10px #00FF41;
+    z-index: 9998;
+}
 
 /* --- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ --- */
 @media (max-width: 768px) {
