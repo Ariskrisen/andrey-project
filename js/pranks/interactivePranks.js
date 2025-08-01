@@ -5,7 +5,7 @@ import { showElement, hideElement, showPrankMessage } from '../utils.js';
 
 let fetchDataAndUpdateDisplay;
 
-// --- НОВАЯ СИСТЕМА "ШКАЛА ЯРОСТИ" ---
+// --- НОВАЯ, ИСПРАВЛЕННАЯ СИСТЕМА "ШКАЛА ЯРОСТИ" ---
 const rageSystem = {
     clicks: 0,
     startTime: Date.now(),
@@ -15,51 +15,62 @@ const rageSystem = {
 };
 
 async function onReset() {
+    // Если кнопка уже исчезла или сайт "мертв", ничего не делаем
     if (state.isPunished || state.isDead) return;
 
     const now = Date.now();
+    // Сбрасываем счетчик кликов, если прошла минута
     if (now - rageSystem.startTime > rageSystem.timeframe) {
         rageSystem.clicks = 0;
         rageSystem.startTime = now;
     }
+    
     rageSystem.clicks++;
 
+    // --- Проверяем уровень угрозы ---
     if (rageSystem.clicks >= rageSystem.punishThreshold) {
+        // УРОВЕНЬ 2: ГНЕВ
         punishUser();
         return;
     }
     
     if (rageSystem.clicks >= rageSystem.warningThreshold) {
+        // УРОВЕНЬ 1: РАЗДРАЖЕНИЕ (ПРЕДУПРЕЖДЕНИЕ)
         warnUser();
         return;
     }
 
-    // Обычный клик
+    // --- УРОВЕНЬ 0: ОБЫЧНЫЙ КЛИК С КУЛДАУНОМ ---
     elements.resetButton.disabled = true;
     try {
+        if (elements.dramaticSound) { elements.dramaticSound.currentTime = 0; elements.dramaticSound.play(); }
         await fetch(CONFIG.API_URL + '/api/reset', { method: 'POST' });
         document.dispatchEvent(new CustomEvent('updateData'));
         if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
     } finally {
-        setTimeout(() => { elements.resetButton.disabled = false; }, 2000);
+        setTimeout(() => {
+            elements.resetButton.disabled = false;
+        }, 2000);
     }
 }
 
 async function warnUser() {
     elements.resetButton.disabled = true;
     
-    // Обнуляем счетчик на сервере
+    // 1. Обнуляем счетчик на сервере
     try {
         await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
-        document.dispatchEvent(new CustomEvent('updateData'));
+        document.dispatchEvent(new CustomEvent('updateData')); // Обновляем UI, чтобы показать "0"
     } catch (error) { console.error('Не удалось обнулить счетчик:', error); }
 
+    // 2. Показываем Скрепыша с угрозой
     if (elements.clippy) {
         showElement(elements.clippy, false, 'flex');
         const bubble = elements.clippy.querySelector('.clippy-bubble');
         if(bubble) bubble.textContent = "Эй, полегче. Я слежу за тобой.";
     }
 
+    // 3. Блокируем кнопку на 10 секунд
     setTimeout(() => {
         elements.resetButton.disabled = false;
         if(elements.clippy) hideElement(elements.clippy);
@@ -67,6 +78,7 @@ async function warnUser() {
 }
 
 function punishUser() {
+    // Ставим флаг, что пользователь наказан
     state.isPunished = true;
     
     const overlay = document.createElement('div');
@@ -77,6 +89,7 @@ function punishUser() {
     setTimeout(() => overlay.classList.add('show'), 10);
     document.body.classList.add('shake');
     
+    // Кнопка исчезает
     if(elements.resetButton) elements.resetButton.style.display = 'none';
 
     setTimeout(() => {
@@ -86,22 +99,22 @@ function punishUser() {
     }, 4000);
 }
 
-// Перехватываем клик на "Форматировать систему"
 async function onFullReset() {
-    if (state.isPunished) {
+    // ИСПРАВЛЕНО: Проверяем флаг, а не существование кнопки
+    if (state.isPunished && !state.isDead) {
         // УРОВЕНЬ 3: ЯРОСТЬ
         triggerRage();
         return;
     }
 
+    // Обычное поведение (если пользователь не наказан)
     if (confirm('Вы уверены, что хотите отформатировать систему?')) {
-        // Обычное поведение
         elements.fullResetButton.disabled = true;
         document.body.classList.add('shake');
         try {
             await fetch(CONFIG.API_URL + '/api/full-reset', { method: 'POST' });
             document.dispatchEvent(new CustomEvent('updateData'));
-            // Возвращаем кнопку, если она была скрыта
+            // Сбрасываем все флаги и возвращаем кнопку
             if(elements.resetButton) elements.resetButton.style.display = 'inline-block';
             state.isPunished = false;
             rageSystem.clicks = 0;
@@ -119,7 +132,6 @@ function triggerRage() {
         const interval = setInterval(() => {
             if (percent >= 100) {
                 clearInterval(interval);
-                // После BSOD сайт "умирает"
                 hideElement(elements.bsod);
                 showElement(document.getElementById('deadSiteOverlay'));
                 document.body.classList.add('dead-site');
@@ -132,8 +144,6 @@ function triggerRage() {
         }, 50);
     }
 }
-
-
 function onRunawayButtonMouseOver(e) {
     if (Math.random() > 0.75) {
         const button = e.target;
@@ -272,6 +282,8 @@ function setupInteractiveClippy() {
 }
 
 export function initInteractivePranks(fetchDataFn) {
+    fetchDataAndUpdateDisplay = fetchDataFn;
+    
     if (elements.resetButton) {
         elements.resetButton.addEventListener('click', onReset);
         elements.resetButton.addEventListener('mouseover', onRunawayButtonMouseOver);
