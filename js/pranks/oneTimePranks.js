@@ -59,7 +59,6 @@ function setupFakeLoader() {
                     clearInterval(interval);
                     if(elements.fakeLoader) {
                         elements.fakeLoader.querySelector('p').textContent = 'Загрузка терпения... Ошибка.';
-                        // ИСПРАВЛЕНО: Скрываем окно через 3 секунды после ошибки
                         setTimeout(() => {
                             hideElement(elements.fakeLoader);
                         }, 3000);
@@ -81,6 +80,36 @@ function setupUselessSwitch() {
     }
 }
 
+function setupBSOD() {
+    if (!elements.bsod) return;
+    setTimeout(() => {
+        showElement(elements.bsod);
+        const progress = document.getElementById('bsodProgress');
+        let percent = 0;
+        const interval = setInterval(() => {
+            if (percent >= 100) {
+                clearInterval(interval);
+                // Можно добавить перезагрузку страницы для полного эффекта
+                // location.reload();
+            } else {
+                percent++;
+                if(progress) progress.textContent = percent;
+            }
+        }, 100);
+    }, 120000); // Появится через 2 минуты
+}
+
+function setupMemoryLeak() {
+    setTimeout(() => {
+        if(elements.container) elements.container.style.transition = "all 2s ease-in";
+        const meltables = [elements.counter, elements.timer, elements.statusMessage, elements.resetButton, elements.fullResetButton, document.querySelector('.container')];
+        meltables.forEach(el => {
+            if (el) el.classList.add('melting');
+        });
+    }, 180000); // Начнется через 3 минуты
+}
+
+
 export function initOneTimePranks() {
     setupCookieBanner();
     setupFakeError();
@@ -89,4 +118,6 @@ export function initOneTimePranks() {
     setupPaywall();
     setupFakeLoader();
     setupUselessSwitch();
+    setupBSOD();
+    setupMemoryLeak();
 }
