@@ -1,7 +1,6 @@
 import { CONFIG } from '../config.js';
 import { elements } from '../dom.js';
-import { showElement, hideElement, randomDelay } from '../utils.js';
-import { state } from '../state.js';
+import { showElement, hideElement, randomDelay, showPrankMessage } from '../utils.js';
 
 function setupCookieBanner() {
     if (!localStorage.getItem('cookies_accepted')) {
@@ -17,9 +16,12 @@ function setupCookieBanner() {
 
 function setupFakeError() {
     if (elements.fakeError) {
-        setTimeout(() => showElement(elements.fakeError), randomDelay(CONFIG.FAKE_ERROR_DELAY));
-        elements.closeErrorBtn.addEventListener('click', () => hideElement(elements.fakeError));
-        elements.okErrorBtn.addEventListener('click', () => hideElement(elements.fakeError));
+        setTimeout(() => {
+            if(elements.xpErrorSound) elements.xpErrorSound.play();
+            showElement(elements.fakeError);
+        }, randomDelay(CONFIG.FAKE_ERROR_DELAY));
+        if (elements.closeErrorBtn) elements.closeErrorBtn.addEventListener('click', () => hideElement(elements.fakeError));
+        if (elements.okErrorBtn) elements.okErrorBtn.addEventListener('click', () => hideElement(elements.fakeError));
     }
 }
 
@@ -36,14 +38,14 @@ function setupUpdateNotification() {
 function setupClippy() {
     if(elements.clippy) {
         setTimeout(() => showElement(elements.clippy, false, 'flex'), CONFIG.CLIPPY_DELAY);
-        elements.closeClippyBtn.addEventListener('click', () => hideElement(elements.clippy));
+        if(elements.closeClippyBtn) elements.closeClippyBtn.addEventListener('click', () => hideElement(elements.clippy));
     }
 }
 
 function setupPaywall() {
     if(elements.paywall) {
         setTimeout(() => showElement(elements.paywall), CONFIG.PAYWALL_DELAY);
-        elements.closePaywall.addEventListener('click', () => hideElement(elements.paywall));
+        if(elements.closePaywall) elements.closePaywall.addEventListener('click', () => hideElement(elements.paywall));
     }
 }
 
@@ -65,6 +67,14 @@ function setupFakeLoader() {
     }
 }
 
+function setupUselessSwitch() {
+    if (elements.uselessSwitch) {
+        elements.uselessSwitch.addEventListener('click', () => {
+            showPrankMessage("Этот переключатель ничего не делает. Но вы его нажали.");
+        });
+    }
+}
+
 export function initOneTimePranks() {
     setupCookieBanner();
     setupFakeError();
@@ -72,4 +82,5 @@ export function initOneTimePranks() {
     setupClippy();
     setupPaywall();
     setupFakeLoader();
+    setupUselessSwitch();
 }

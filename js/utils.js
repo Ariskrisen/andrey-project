@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { elements } from './dom.js';
 
 export function typeMessage(element, message) {
     if (state.isTyping || !element) return;
@@ -30,8 +31,20 @@ export function hideElement(element, useClass = false) {
     }
 }
 
-// ДОБАВЬТЕ ЭТОТ ФРАГМЕНТ В КОНЕЦ ФАЙЛА utils.js
-
 export function randomDelay(config) {
     return Math.random() * (config.max - config.min) + config.min;
+}
+
+// Новая утилита для временных сообщений
+export function showPrankMessage(message, duration = 4000) {
+    if (state.isPrankMessageActive || !elements.statusMessage) return; 
+    
+    state.isPrankMessageActive = true;
+    const originalText = elements.statusMessage.textContent;
+    typeMessage(elements.statusMessage, message);
+    
+    setTimeout(() => {
+        typeMessage(elements.statusMessage, originalText);
+        state.isPrankMessageActive = false;
+    }, duration);
 }

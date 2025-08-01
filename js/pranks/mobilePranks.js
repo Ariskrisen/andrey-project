@@ -1,12 +1,18 @@
 import { CONFIG } from '../config.js';
 
+let lastShakeTime = 0;
+
 function handleDeviceMotion(event) {
+    const now = Date.now();
+    if (now - lastShakeTime < 5000) return; // 5 секунд "перезарядка"
+
     const { x, y, z } = event.accelerationIncludingGravity;
-    if (x === null || y === null || z === null) return; // Проверка на наличие данных
+    if (x === null || y === null || z === null) return;
     
     const acceleration = Math.sqrt(x*x + y*y + z*z);
     
     if (acceleration > CONFIG.SHAKE_THRESHOLD) {
+        lastShakeTime = now;
         if (typeof confetti === 'function') {
             confetti({
                 particleCount: 200,
@@ -15,17 +21,10 @@ function handleDeviceMotion(event) {
                 gravity: 0.5
             });
         }
-        // Временно убираем обработчик, чтобы избежать многократных срабатываний
-        window.removeEventListener('devicemotion', handleDeviceMotion);
-        // Возвращаем его через 5 секунд ("перезарядка")
-        setTimeout(() => {
-            window.addEventListener('devicemotion', handleDeviceMotion);
-        }, 5000);
     }
 }
 
 function requestMotionPermission() {
-    // Для iOS 13+
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceMotionEvent.requestPermission()
             .then(permissionState => {
@@ -35,15 +34,12 @@ function requestMotionPermission() {
             })
             .catch(console.error);
     } else {
-        // Для Android и других устройств, не требующих явного разрешения
         window.addEventListener('devicemotion', handleDeviceMotion);
     }
 }
 
 export function initMobilePranks() {
-    // Проверяем, поддерживает ли браузер вообще это событие
     if ('DeviceMotionEvent' in window) {
-        // Запрос разрешения сработает по первому клику/тапу пользователя на странице
         document.body.addEventListener('click', requestMotionPermission, { once: true });
     }
 }

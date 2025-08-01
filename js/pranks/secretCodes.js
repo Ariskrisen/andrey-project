@@ -1,9 +1,9 @@
 import { elements } from '../dom.js';
 import { state } from '../state.js';
-import { typeMessage } from '../utils.js';
+import { showPrankMessage } from '../utils.js';
 
 function activateMatrix() {
-    if (!elements.matrixCanvas) return;
+    if (!elements.matrixCanvas || elements.matrixCanvas.style.display === 'block') return;
     elements.matrixCanvas.style.display = 'block';
     const ctx = elements.matrixCanvas.getContext('2d');
     elements.matrixCanvas.width = window.innerWidth;
@@ -35,20 +35,20 @@ function activateGravity() {
     if (!container) return;
     const elems = Array.from(container.children);
     elems.forEach(el => {
-        // Делаем копию, чтобы не ломать основной элемент
         const clone = el.cloneNode(true);
         const rect = el.getBoundingClientRect();
-        clone.style.position = 'absolute';
+        clone.style.position = 'fixed';
         clone.style.left = `${rect.left}px`;
         clone.style.top = `${rect.top}px`;
         clone.style.margin = '0';
+        clone.style.zIndex = '9999';
         document.body.appendChild(clone);
         
         anime({
             targets: clone,
             top: window.innerHeight,
             rotate: (Math.random() - 0.5) * 720,
-            easing: 'easeInQuad',
+            easing: 'easeInCubic',
             duration: 2000,
             complete: () => clone.remove()
         });
@@ -66,12 +66,9 @@ export function initSecretCodes() {
         if (typedKeys.endsWith('chaos')) { document.body.classList.toggle('chaos'); typedKeys = ''; }
         if (typedKeys.endsWith('gravity')) { activateGravity(); typedKeys = ''; }
         if (typedKeys.endsWith('iddqd')) {
-            typeMessage(elements.statusMessage, 'GOD MODE ACTIVATED');
+            showPrankMessage('GOD MODE ACTIVATED', 5000);
             state.godMode = true;
-            setTimeout(() => {
-                state.godMode = false;
-                typeMessage(elements.statusMessage, 'GOD MODE DEACTIVATED');
-            }, 5000);
+            setTimeout(() => { state.godMode = false; }, 5000);
             typedKeys = '';
         }
 

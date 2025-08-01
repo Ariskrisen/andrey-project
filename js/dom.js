@@ -1,16 +1,18 @@
 export const elements = {};
-const elementIds = ['counter', 'timer', 'resetButton', 'fullResetButton', 'statusMessage',
- 'dramaticSound', 'matrixCanvas', 'cookieBanner', 'acceptCookies',
- 'customContextMenu', 'fakeError', 'updateNotification', 'uselessSwitch',
- 'clippy', 'paywall', 'closePaywall', 'fakeLoader', 'shatterContainer',
- 'duck', 'quackSound', 'xpErrorSound'];
 
 export function findDOMElements() {
+    const elementIds = ['counter', 'timer', 'resetButton', 'fullResetButton', 'statusMessage',
+     'dramaticSound', 'matrixCanvas', 'cookieBanner', 'acceptCookies',
+     'customContextMenu', 'fakeError', 'updateNotification', 'uselessSwitch',
+     'clippy', 'paywall', 'closePaywall', 'fakeLoader', 'shatterContainer',
+     'duck', 'quackSound', 'xpErrorSound'];
+    
     elementIds.forEach(id => {
         elements[id] = document.getElementById(id);
     });
-    elements.closeErrorBtn = document.querySelector('#fakeError .close-btn');
-    elements.okErrorBtn = document.querySelector('#fakeError .ok-btn');
-    elements.closeClippyBtn = document.querySelector('#clippy .close-btn');
+    // Находим кнопки по их новым ID
+    elements.closeErrorBtn = document.getElementById('closeErrorBtn');
+    elements.okErrorBtn = document.getElementById('okErrorBtn');
+    elements.closeClippyBtn = document.getElementById('closeClippyBtn');
     elements.loaderProgress = document.querySelector('.loader-progress');
 }

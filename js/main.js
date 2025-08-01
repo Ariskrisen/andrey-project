@@ -12,13 +12,14 @@ import { initMobilePranks } from './pranks/mobilePranks.js';
 async function fetchDataAndUpdateDisplay() {
     try {
         const response = await fetch(CONFIG.API_URL + '/api/data');
+        if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
         const data = await response.json();
-        state.lastResetTime = data.lastResetTime;
+        state.lastResetTime = new Date(data.lastResetTime).getTime();
         updateCounter(data.count);
-        if (data.count === 0) { typeMessage(elements.statusMessage, "Андрей еще ни разу не пришел вовремя. Но мы верим."); }
+        // Убрали отсюда обновление сообщения, чтобы оно не конфликтовало с приколами
     } catch (error) {
         console.error('Ошибка при загрузке данных:', error);
-        elements.counter.textContent = 'Ошибка загрузки данных';
+        if(elements.counter) elements.counter.textContent = 'Ошибка загрузки данных';
     }
 }
 
@@ -43,23 +44,30 @@ function updateCounter(count) {
 function updateTimerDisplay() {
     const now = Date.now();
     const effectiveTime = state.godMode ? (state.lastResetTime - (now - state.lastResetTime)) : now;
-    const elapsedTime = effectiveTime - state.lastResetTime;
+    const elapsedTime = Math.max(0, effectiveTime - state.lastResetTime);
     const days = Math.floor(elapsedTime / (1000 * 60 * 60 * 24));
+
     if (days !== state.lastDayCount) {
         let message = "Ожидаем прибытия Андрея...";
         if (days >= 30) { message = "Прошел месяц. Мы уже и забыли, как выглядит Андрей."; }
         else if (days >= 7) { message = "Прошла неделя. Пора высылать поисковую группу."; }
         else if (days >= 1) { message = `Прошло ${days} дня. Андрей, ты где?`; }
+        
         const currentCountText = elements.counter ? elements.counter.textContent.split(': ')[1] : '1';
-        if (currentCountText !== "0 раз" && currentCountText) { typeMessage(elements.statusMessage, message); }
+        if (currentCountText && currentCountText.includes("раз") && !state.isPrankMessageActive) {
+            typeMessage(elements.statusMessage, message);
+        }
         state.lastDayCount = days;
     }
+
     const hours = Math.floor((elapsedTime / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
     const seconds = Math.floor((elapsedTime / 1000) % 60);
     const formattedTime = `${String(days).padStart(2, '0')}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
     if (elements.timer) elements.timer.textContent = formattedTime;
     document.title = `${formattedTime} | Андрей опаздывает`;
+    
     if (elements.timer) {
         if (days >= 2) { elements.timer.classList.add('glitch'); } 
         else { elements.timer.classList.remove('glitch'); }
@@ -84,11 +92,14 @@ function init() {
 
     document.addEventListener('visibilitychange', () => {
         state.isTabActive = document.visibilityState === 'visible';
-        if (state.isTabActive) fetchDataAndUpdateDisplay();
+        if (state.isTabActive) {
+            console.log("Tab is active, fetching data...");
+            fetchDataAndUpdateDisplay();
+        }
     });
 
     fetchDataAndUpdateDisplay();
     setInterval(gameLoop, 1000);
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', init);```
